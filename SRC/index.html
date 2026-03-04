@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Documentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --error: #ef4444;
+            --bg-light: #f9fafb;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-button {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        #suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #suggestions.visible {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-light);
+        }
+
+        .suggestion-item.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .suggestion-sku {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .suggestion-item.selected .suggestion-sku {
+            color: white;
+        }
+
+        .suggestion-name {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .suggestion-item.selected .suggestion-name {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .results {
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .result-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .result-card.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .result-card.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .result-sku {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .result-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .result-link {
+            display: inline-block;
+        }
+
+        .result-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .result-link a:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-weight: 600;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Buscador de Documentos</h1>
+            <p class="subtitle">Busca por SKU, nombre del producto o URL</p>
+        </header>
+
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Escribe SKU, nombre o URL del PDF..."
+                    autocomplete="off"
+                >
+                <div id="suggestions"></div>
+            </div>
+            <button class="search-button" onclick="search()">Buscar</button>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        let allProducts = [];
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            
+            // Event listeners
+            document.getElementById('searchInput').addEventListener('keyup', updateSuggestions);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    search();
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (e.target.id !== 'searchInput') {
+                    hideSuggestions();
+                }
+            });
+        });
+
+        function loadProducts() {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    allProducts = data;
+                    console.log(`✓ Cargados ${allProducts.length} productos`);
+                })
+                .catch(error => {
+                    console.error('Error cargando datos:', error);
+                    displayError('No se pudieron cargar los datos. Verifica que data.json exista.');
+                });
+        }
+
+        function updateSuggestions() {
+            const input = document.getElementById('searchInput').value.trim().toLowerCase();
+            const suggestionsDiv = document.getElementById('suggestions');
+
+            if (input.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            const filtered = allProducts.filter(p => 
+                p.sku.toLowerCase().includes(input) ||
+                p.name.toLowerCase().includes(input) ||
+                (p.pdf && p.pdf.toLowerCase().includes(input))
+            ).slice(0, 8);
+
+            if (filtered.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            suggestionsDiv.innerHTML = filtered.map(p => `
+                <div class="suggestion-item" onclick="selectSuggestion('${p.sku.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}', '${(p.pdf || '').replace(/'/g, "\\'")}')">
+                    <div class="suggestion-sku">${escapeHtml(p.sku)}</div>
+                    <div class="suggestion-name">${escapeHtml(p.name.substring(0, 60))}</div>
+                </div>
+            `).join('');
+
+            suggestionsDiv.classList.add('visible');
+        }
+
+        function selectSuggestion(sku, name, pdf) {
+            document.getElementById('searchInput').value = `${sku} - ${name}`;
+            hideSuggestions();
+            search();
+        }
+
+        function hideSuggestions() {
+            document.getElementById('suggestions').classList.remove('visible');
+        }
+
+        function search() {
+            const input = document.getElementById('searchInput').value.trim();
+            const searchLower = input.toLowerCase();
+
+            if (input.length === 0) {
+                displayEmpty();
+                return;
+            }
+
+            const found = allProducts.find(p => 
+                p.sku.toLowerCase() === searchLower ||
+                p.name.toLowerCase() === searchLower ||
+                p.sku.toLowerCase().includes(searchLower) ||
+                p.name.toLowerCase().includes(searchLower) ||
+                (p.pdf && p.pdf.toLowerCase().includes(searchLower))
+            );
+
+            if (found) {
+                displayResult(found);
+            } else {
+                displayNotFound(input);
+            }
+        }
+
+        function displayResult(product) {
+            const resultsDiv = document.getElementById('results');
+            const pdfUrl = product.pdf || '#';
+            
+            resultsDiv.innerHTML = `
+                <div class="result-card success">
+                    <div class="result-sku">SKU: ${escapeHtml(product.sku)}</div>
+                    <div class="result-name">${escapeHtml(product.name)}</div>
+                    <div class="result-link">
+                        ${pdfUrl && pdfUrl !== '#' ? 
+                            `<a href="${pdfUrl}" target="_blank" download>📥 Descargar PDF</a>` :
+                            '<span style="color: #9ca3af;">PDF no disponible</span>'
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayNotFound(query) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result-card error">
+                    <div class="error-message">❌ No encontrado</div>
+                    <p style="margin-top: 12px; color: #6b7280;">
+                        No se encontró un producto que coincida con: <strong>${escapeHtml(query)}</strong>
+                    </p>
+                </div>
+            `;
+        }
+
+        function displayEmpty() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📦</div>
+                    <p>Escribe algo para buscar</p>
+                </div>
+            `;
+        }
+
+        function displayError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result-card error">
+                    <div class="error-message">⚠️ Error</div>
+                    <p style="margin-top: 12px; color: #6b7280;">${message}</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
