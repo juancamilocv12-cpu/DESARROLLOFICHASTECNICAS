@@ -531,9 +531,10 @@
         }
 
         function selectSuggestion(sku, name, pdf) {
-            document.getElementById('searchInput').value = `${sku} - ${name}`;
+            document.getElementById('searchInput').value = name;
             hideSuggestions();
-            search();
+            // Mostrar directamente el resultado con los datos que ya tenemos
+            displayResult({ sku, name, pdf });
         }
 
         function hideSuggestions() {
