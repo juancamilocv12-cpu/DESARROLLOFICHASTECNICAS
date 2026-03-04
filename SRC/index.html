@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Documentos</title>
+    <title>Buscador de Fichas Técnicas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,62 +12,124 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --success: #10b981;
-            --error: #ef4444;
-            --bg-light: #f9fafb;
-            --text: #1f2937;
-            --border: #e5e7eb;
-            --shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-light);
-            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: #F6F8FC;
+            color: #0F172A;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
         }
 
-        header {
+        .main-card {
+            width: 100%;
+            max-width: 980px;
+            background: white;
+            border-radius: 18px;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            padding: 26px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Animated gradient ring - activarse con input focus */
+        .main-card.focus-active::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 18px;
+            padding: 2px;
+            background: linear-gradient(90deg, #2563EB, #8B5CF6, #EC4899, #2563EB);
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: gradientRotate 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gradientRotate {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .main-card {
+                padding: 18px;
+            }
+        }
+
+        /* Header con logo y título */
+        .header-section {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            height: 46px;
+            width: auto;
+            margin-bottom: 16px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.95;
+            transition: opacity 0.3s ease;
+        }
+
+        .brand-logo-fallback {
+            height: 46px;
+            width: 46px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #2563EB 0%, #8B5CF6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-size: 18px;
+            letter-spacing: -0.02em;
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--primary);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #0F172A;
+            margin-bottom: 8px;
+            line-height: 1.2;
         }
 
         .subtitle {
-            color: #6b7280;
-            font-size: 1.1rem;
+            color: #64748B;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Search box */
+        .search-section {
+            margin-bottom: 28px;
         }
 
         .search-box {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            gap: 12px;
+            align-items: flex-start;
         }
 
         .search-input-wrapper {
@@ -74,68 +137,106 @@
             position: relative;
         }
 
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
         input[type="text"] {
             width: 100%;
-            padding: 12px 16px;
-            font-size: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
+            height: 52px;
+            padding: 0 16px 0 48px;
+            font-size: 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 14px;
+            background: white;
+            color: #0F172A;
             transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]::placeholder {
+            color: #94A3B8;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #2563EB;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        input[type="text"]:focus ~ .search-icon {
+            color: #2563EB;
         }
 
         .search-button {
-            padding: 12px 24px;
-            background: var(--primary);
+            height: 52px;
+            padding: 0 24px;
+            background: #2563EB;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
+            font-family: inherit;
         }
 
         .search-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+            background: #1D4ED8;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
         }
 
         .search-button:active {
             transform: translateY(0);
         }
 
+        /* Suggestions dropdown */
         #suggestions {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 8px);
             left: 0;
             right: 0;
             background: white;
-            border: 1px solid var(--border);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 300px;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            max-height: 320px;
             overflow-y: auto;
             display: none;
             z-index: 100;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
         }
 
         #suggestions.visible {
             display: block;
+            animation: suggestionsSlide 0.2s ease-out;
+        }
+
+        @keyframes suggestionsSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .suggestion-item {
             padding: 12px 16px;
             cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s ease;
+            border-bottom: 1px solid #F1F5F9;
+            transition: background 0.15s ease;
         }
 
         .suggestion-item:last-child {
@@ -143,79 +244,90 @@
         }
 
         .suggestion-item:hover {
-            background: var(--bg-light);
-        }
-
-        .suggestion-item.selected {
-            background: var(--primary);
-            color: white;
+            background: #F8FAFC;
         }
 
         .suggestion-sku {
             font-weight: 600;
-            color: var(--primary);
-        }
-
-        .suggestion-item.selected .suggestion-sku {
-            color: white;
+            color: #2563EB;
+            font-size: 14px;
         }
 
         .suggestion-name {
-            font-size: 0.9rem;
-            color: #6b7280;
+            font-size: 13px;
+            color: #64748B;
             margin-top: 4px;
+            line-height: 1.4;
         }
 
-        .suggestion-item.selected .suggestion-name {
-            color: rgba(255,255,255,0.8);
-        }
-
+        /* Results section */
         .results {
-            margin-top: 30px;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            min-height: 80px;
         }
 
         .result-card {
             background: white;
             padding: 24px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            animation: slideIn 0.3s ease-out;
+            border-radius: 14px;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+            animation: resultAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes resultAppear {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result-card.success {
-            border-left: 4px solid var(--success);
+            border-left-color: #22C55E;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.02) 0%, transparent 100%);
         }
 
         .result-card.error {
-            border-left: 4px solid var(--error);
+            border-left-color: #EF4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.02) 0%, transparent 100%);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .result-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .result-text-section {
+            flex: 1;
         }
 
         .result-sku {
             font-weight: 600;
-            color: var(--primary);
-            font-size: 0.9rem;
-            margin-bottom: 8px;
+            color: #2563EB;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
 
         .result-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text);
+            font-size: 17px;
+            font-weight: 700;
+            color: #0F172A;
+            line-height: 1.3;
             margin-bottom: 16px;
-        }
-
-        .result-link {
-            display: inline-block;
         }
 
         .result-link a {
@@ -223,81 +335,122 @@
             align-items: center;
             gap: 8px;
             padding: 10px 16px;
-            background: var(--primary);
+            background: #2563EB;
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 10px;
             font-weight: 600;
+            font-size: 14px;
             transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
         }
 
         .result-link a:hover {
-            background: var(--primary-dark);
+            background: #1D4ED8;
             transform: translateY(-2px);
-            box-shadow: var(--shadow);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
         }
 
-        .error-message {
-            color: var(--error);
-            font-weight: 600;
+        .result-unavailable {
+            color: #94A3B8;
+            font-size: 14px;
+            font-style: italic;
         }
 
-        .success-message {
-            color: var(--success);
-            font-weight: 600;
-        }
-
+        /* Empty state */
         .empty-state {
             text-align: center;
-            padding: 40px;
-            color: #9ca3af;
+            padding: 60px 24px 40px;
+            color: #94A3B8;
         }
 
         .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.7;
         }
 
+        .empty-state-text {
+            font-size: 16px;
+            color: #64748B;
+        }
+
+        /* Error state */
+        .error-state {
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .error-state-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #EF4444;
+            margin-bottom: 8px;
+        }
+
+        /* Responsive */
         @media (max-width: 640px) {
-            .container {
-                padding: 20px 16px;
+            h1 {
+                font-size: 1.75rem;
             }
 
-            h1 {
-                font-size: 1.8rem;
+            .subtitle {
+                font-size: 14px;
             }
 
             .search-box {
                 flex-direction: column;
+                gap: 8px;
             }
 
             .search-button {
                 width: 100%;
             }
+
+            .result-card {
+                padding: 18px;
+            }
+
+            .result-name {
+                font-size: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🔍 Buscador de Documentos</h1>
-            <p class="subtitle">Busca por SKU, nombre del producto o URL</p>
-        </header>
-
-        <div class="search-box">
-            <div class="search-input-wrapper">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="Escribe SKU, nombre o URL del PDF..."
-                    autocomplete="off"
+    <div class="page-wrapper">
+        <div class="main-card" id="mainCard">
+            <div class="header-section">
+                <img 
+                    class="brand-logo" 
+                    src="./logo.jpg" 
+                    alt="Logo Comertex"
+                    onerror="this.style.display='none'; document.querySelector('.brand-logo-fallback').style.display='flex';"
                 >
-                <div id="suggestions"></div>
+                <div class="brand-logo-fallback" style="display:none;">🏭</div>
+                <h1>Buscador de Fichas Técnicas</h1>
+                <p class="subtitle">Busca por SKU, nombre del producto o URL del PDF</p>
             </div>
-            <button class="search-button" onclick="search()">Buscar</button>
-        </div>
 
-        <div id="results" class="results"></div>
+            <div class="search-section">
+                <div class="search-box">
+                    <div class="search-input-wrapper">
+                        <div class="search-icon">🔍</div>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Escribe SKU, nombre o URL..."
+                            autocomplete="off"
+                        >
+                        <div id="suggestions"></div>
+                    </div>
+                    <button class="search-button" onclick="search()">Buscar</button>
+                </div>
+            </div>
+
+            <div id="results" class="results"></div>
+        </div>
     </div>
 
     <script>
@@ -308,12 +461,25 @@
             loadProducts();
             
             // Event listeners
-            document.getElementById('searchInput').addEventListener('keyup', updateSuggestions);
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            const searchInput = document.getElementById('searchInput');
+            const mainCard = document.getElementById('mainCard');
+            
+            searchInput.addEventListener('keyup', updateSuggestions);
+            searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     search();
                 }
             });
+            
+            // Animated gradient ring on focus
+            searchInput.addEventListener('focus', function() {
+                mainCard.classList.add('focus-active');
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                mainCard.classList.remove('focus-active');
+            });
+            
             document.addEventListener('click', function(e) {
                 if (e.target.id !== 'searchInput') {
                     hideSuggestions();
@@ -357,7 +523,7 @@
             suggestionsDiv.innerHTML = filtered.map(p => `
                 <div class="suggestion-item" onclick="selectSuggestion('${p.sku.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}', '${(p.pdf || '').replace(/'/g, "\\'")}')">
                     <div class="suggestion-sku">${escapeHtml(p.sku)}</div>
-                    <div class="suggestion-name">${escapeHtml(p.name.substring(0, 60))}</div>
+                    <div class="suggestion-name">${escapeHtml(p.name.substring(0, 75))}</div>
                 </div>
             `).join('');
 
@@ -400,17 +566,23 @@
 
         function displayResult(product) {
             const resultsDiv = document.getElementById('results');
-            const pdfUrl = product.pdf || '#';
+            const pdfUrl = product.pdf || '';
+            
+            const buttonHtml = pdfUrl ? 
+                `<a href="${pdfUrl}" target="_blank" onclick="if(this.href) window.open(this.href); return false;">📥 Descargar Ficha</a>` :
+                '';
             
             resultsDiv.innerHTML = `
                 <div class="result-card success">
-                    <div class="result-sku">SKU: ${escapeHtml(product.sku)}</div>
-                    <div class="result-name">${escapeHtml(product.name)}</div>
-                    <div class="result-link">
-                        ${pdfUrl && pdfUrl !== '#' ? 
-                            `<a href="${pdfUrl}" target="_blank" download>📥 Descargar PDF</a>` :
-                            '<span style="color: #9ca3af;">PDF no disponible</span>'
-                        }
+                    <div class="result-header">
+                        <div class="result-icon">✓</div>
+                        <div class="result-text-section">
+                            <div class="result-sku">SKU: ${escapeHtml(product.sku)}</div>
+                            <div class="result-name">${escapeHtml(product.name)}</div>
+                            <div class="result-link">
+                                ${buttonHtml || '<span class="result-unavailable">Ficha técnica no disponible</span>'}
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -420,10 +592,15 @@
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = `
                 <div class="result-card error">
-                    <div class="error-message">❌ No encontrado</div>
-                    <p style="margin-top: 12px; color: #6b7280;">
-                        No se encontró un producto que coincida con: <strong>${escapeHtml(query)}</strong>
-                    </p>
+                    <div class="result-header">
+                        <div class="result-icon">✕</div>
+                        <div class="result-text-section">
+                            <div class="error-state-title">No encontrado</div>
+                            <p style="margin-top: 8px; color: #64748B; font-size: 14px;">
+                                No hay coincidencias para: <strong>${escapeHtml(query)}</strong>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -432,8 +609,8 @@
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📦</div>
-                    <p>Escribe algo para buscar</p>
+                    <div class="empty-state-icon">📋</div>
+                    <p class="empty-state-text">Escribe algo para buscar una ficha técnica</p>
                 </div>
             `;
         }
@@ -442,8 +619,10 @@
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = `
                 <div class="result-card error">
-                    <div class="error-message">⚠️ Error</div>
-                    <p style="margin-top: 12px; color: #6b7280;">${message}</p>
+                    <div class="error-state">
+                        <div class="error-state-title">⚠️ Error</div>
+                        <p style="margin-top: 8px; color: #64748B; font-size: 14px;">${message}</p>
+                    </div>
                 </div>
             `;
         }

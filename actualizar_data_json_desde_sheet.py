@@ -2,6 +2,7 @@
 import csv
 import io
 import json
+import shutil
 import subprocess
 import urllib.parse
 import urllib.request
@@ -10,6 +11,7 @@ from pathlib import Path
 SHEET_ID = "1TqIvMr7oR3lyNvpS3rx7qf5pRunOvm3ytG8vmN_EC7A"
 SHEET_NAME = "Sheet1"
 OUTPUT_PATH = Path(__file__).parent / "SRC" / "data.json"
+CURL_BIN = shutil.which("curl") or "/usr/bin/curl"
 
 
 def build_csv_url(sheet_id: str, sheet_name: str) -> str:
@@ -26,7 +28,7 @@ def load_rows(csv_url: str):
             raw = response.read().decode("utf-8", errors="replace")
     except Exception:
         result = subprocess.run(
-            ["curl", "-L", "--silent", csv_url],
+            [CURL_BIN, "-L", "--silent", csv_url],
             check=True,
             capture_output=True,
             text=True,
