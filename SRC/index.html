@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Fichas Técnicas</title>
+    <title>Buscador de Documentos Comerciales</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #f6f8fc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --line: #e2e8f0;
+            --brand: #2563eb;
+            --brand-dark: #1d4ed8;
+            --ok: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,8 +28,8 @@
 
         body {
             font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            background: #F6F8FC;
-            color: #0F172A;
+            background: radial-gradient(circle at 15% 15%, #e8f0ff 0%, transparent 40%), radial-gradient(circle at 85% 5%, #fff4e8 0%, transparent 35%), var(--bg);
+            color: var(--text-main);
             line-height: 1.6;
             min-height: 100vh;
         }
@@ -30,8 +44,8 @@
 
         .main-card {
             width: 100%;
-            max-width: 980px;
-            background: white;
+            max-width: 1020px;
+            background: var(--card-bg);
             border-radius: 18px;
             border: 1px solid rgba(15, 23, 42, 0.06);
             box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
@@ -40,16 +54,16 @@
             transition: all 0.3s ease;
         }
 
-        /* Animated gradient ring - activarse con input focus */
         .main-card.focus-active::before {
             content: '';
             position: absolute;
             inset: -2px;
             border-radius: 18px;
             padding: 2px;
-            background: linear-gradient(90deg, #2563EB, #8B5CF6, #EC4899, #2563EB);
+            background: linear-gradient(90deg, #2563eb, #16a34a, #f59e0b, #2563eb);
             background-size: 300% 300%;
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             animation: gradientRotate 8s linear infinite;
@@ -60,24 +74,153 @@
             0% {
                 background-position: 0% 50%;
             }
+
             50% {
                 background-position: 100% 50%;
             }
+
             100% {
                 background-position: 0% 50%;
             }
         }
 
-        @media (max-width: 640px) {
-            .main-card {
-                padding: 18px;
-            }
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
         }
 
-        /* Header con logo y título */
+        .auth-card {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            padding: 24px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+        }
+
+        .auth-card h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="url"],
+        select,
+        input[type="file"] {
+            width: 100%;
+            height: 44px;
+            border: 2px solid var(--line);
+            border-radius: 10px;
+            padding: 0 12px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-main);
+            background: #fff;
+        }
+
+        input[type="file"] {
+            padding-top: 10px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn {
+            height: 44px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            padding: 0 14px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--brand-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .btn-ghost {
+            background: #f8fafc;
+            color: #334155;
+            border: 1px solid var(--line);
+        }
+
+        .btn-ghost:hover {
+            background: #f1f5f9;
+        }
+
+        .auth-error {
+            margin-top: 10px;
+            color: var(--danger);
+            font-size: 13px;
+            min-height: 20px;
+        }
+
+        .app-shell {
+            display: none;
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .header-section {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .brand-logo {
@@ -88,47 +231,44 @@
             margin-left: auto;
             margin-right: auto;
             opacity: 0.95;
-            transition: opacity 0.3s ease;
         }
 
         .brand-logo-fallback {
             height: 46px;
             width: 46px;
             margin: 0 auto 16px;
-            background: linear-gradient(135deg, #2563EB 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #16a34a 100%);
             border-radius: 50%;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             font-weight: 800;
             color: white;
             font-size: 18px;
-            letter-spacing: -0.02em;
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 800;
             letter-spacing: -0.02em;
-            color: #0F172A;
-            margin-bottom: 8px;
+            color: var(--text-main);
+            margin-bottom: 6px;
             line-height: 1.2;
         }
 
         .subtitle {
-            color: #64748B;
-            font-size: 1rem;
+            color: var(--text-muted);
+            font-size: 0.97rem;
             font-weight: 500;
         }
 
-        /* Search box */
         .search-section {
-            margin-bottom: 28px;
+            margin-bottom: 22px;
         }
 
         .search-box {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: flex-start;
         }
 
@@ -142,72 +282,26 @@
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94A3B8;
-            font-size: 18px;
+            color: #94a3b8;
             pointer-events: none;
-            z-index: 1;
         }
 
-        input[type="text"] {
+        #searchInput {
             width: 100%;
             height: 52px;
-            padding: 0 16px 0 48px;
+            padding: 0 16px 0 44px;
+            border: 2px solid var(--line);
+            border-radius: 14px;
             font-size: 16px;
-            border: 2px solid #E2E8F0;
-            border-radius: 14px;
-            background: white;
-            color: #0F172A;
-            transition: all 0.3s ease;
-            font-family: inherit;
         }
 
-        input[type="text"]::placeholder {
-            color: #94A3B8;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #2563EB;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-        }
-
-        input[type="text"]:focus ~ .search-icon {
-            color: #2563EB;
-        }
-
-        .search-button {
-            height: 52px;
-            padding: 0 24px;
-            background: #2563EB;
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-family: inherit;
-        }
-
-        .search-button:hover {
-            background: #1D4ED8;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-        }
-
-        .search-button:active {
-            transform: translateY(0);
-        }
-
-        /* Suggestions dropdown */
         #suggestions {
             position: absolute;
             top: calc(100% + 8px);
             left: 0;
             right: 0;
             background: white;
-            border: 1px solid #E2E8F0;
+            border: 1px solid var(--line);
             border-radius: 12px;
             max-height: 320px;
             overflow-y: auto;
@@ -218,25 +312,12 @@
 
         #suggestions.visible {
             display: block;
-            animation: suggestionsSlide 0.2s ease-out;
-        }
-
-        @keyframes suggestionsSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .suggestion-item {
             padding: 12px 16px;
             cursor: pointer;
-            border-bottom: 1px solid #F1F5F9;
-            transition: background 0.15s ease;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .suggestion-item:last-child {
@@ -244,78 +325,58 @@
         }
 
         .suggestion-item:hover {
-            background: #F8FAFC;
+            background: #f8fafc;
         }
 
         .suggestion-sku {
             font-weight: 600;
-            color: #2563EB;
+            color: var(--brand);
             font-size: 14px;
         }
 
         .suggestion-name {
             font-size: 13px;
-            color: #64748B;
-            margin-top: 4px;
-            line-height: 1.4;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
-        /* Results section */
         .results {
             min-height: 80px;
         }
 
         .result-card {
             background: white;
-            padding: 24px;
+            padding: 20px;
             border-radius: 14px;
-            border: 1px solid #E2E8F0;
+            border: 1px solid var(--line);
             border-left: 4px solid;
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-            animation: resultAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes resultAppear {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .result-card.success {
-            border-left-color: #22C55E;
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.02) 0%, transparent 100%);
+            border-left-color: var(--ok);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.03) 0%, transparent 100%);
         }
 
         .result-card.error {
-            border-left-color: #EF4444;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.02) 0%, transparent 100%);
+            border-left-color: var(--danger);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, transparent 100%);
         }
 
         .result-header {
             display: flex;
+            gap: 10px;
             align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
         }
 
         .result-icon {
             font-size: 20px;
-            flex-shrink: 0;
             margin-top: 2px;
         }
 
-        .result-text-section {
-            flex: 1;
-        }
-
         .result-sku {
-            font-weight: 600;
-            color: #2563EB;
+            font-weight: 700;
+            color: var(--brand);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -323,181 +384,962 @@
         }
 
         .result-name {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
-            color: #0F172A;
             line-height: 1.3;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
-        .result-link a {
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .download-link {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: #2563EB;
-            color: white;
-            text-decoration: none;
+            gap: 6px;
+            padding: 10px 14px;
             border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
         }
 
-        .result-link a:hover {
-            background: #1D4ED8;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        .download-link.tech {
+            background: var(--brand);
+        }
+
+        .download-link.sales {
+            background: #0891b2;
+        }
+
+        .download-link:hover {
+            filter: brightness(0.95);
         }
 
         .result-unavailable {
-            color: #94A3B8;
+            color: #94a3b8;
             font-size: 14px;
             font-style: italic;
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
-            padding: 60px 24px 40px;
-            color: #94A3B8;
+            padding: 52px 18px 26px;
+            color: #94a3b8;
         }
 
-        .empty-state-icon {
-            font-size: 48px;
+        .admin-panel {
+            display: none;
+            margin-top: 26px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: #f8fafc;
+            padding: 18px;
+        }
+
+        .admin-panel h3 {
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+        }
+
+        .admin-sub {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            align-items: end;
             margin-bottom: 12px;
-            opacity: 0.7;
         }
 
-        .empty-state-text {
-            font-size: 16px;
-            color: #64748B;
+        .admin-step {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
-        /* Error state */
-        .error-state {
-            text-align: center;
-            padding: 40px 24px;
+        .admin-step h4 {
+            margin: 0 0 10px;
+            font-size: 13px;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .error-state-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #EF4444;
+        .reference-picker-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .reference-autocomplete {
+            position: relative;
+        }
+
+        .reference-suggestions {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            max-height: 240px;
+            overflow-y: auto;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            z-index: 40;
+            display: none;
+        }
+
+        .reference-suggestions.visible {
+            display: block;
+        }
+
+        .reference-suggestion {
+            padding: 9px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        .reference-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .reference-suggestion:hover,
+        .reference-suggestion.active {
+            background: #eef2ff;
+            color: #1e293b;
+        }
+
+        .selected-reference-display {
+            min-height: 42px;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            background: #fff;
+            padding: 10px;
+            font-size: 12px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+        }
+
+        .reference-picker-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .reference-summary {
+            background: #fff;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .family-summary {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #78350f;
+        }
+
+        .family-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
             margin-bottom: 8px;
         }
 
-        /* Responsive */
-        @media (max-width: 640px) {
-            h1 {
-                font-size: 1.75rem;
+        .family-list {
+            max-height: 160px;
+            overflow-y: auto;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            background: #fff;
+            padding: 6px 8px;
+        }
+
+        .family-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 12px;
+            color: #78350f;
+        }
+
+        .reference-tools {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .inline-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+
+        .inline-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .create-reference-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .create-reference-card h4 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .create-reference-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .reference-meta {
+            align-self: center;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .reference-summary strong {
+            color: #0f172a;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .status-banner {
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .status-ok {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .admin-lists {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .file-list-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .file-list-card h4 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .file-search-input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            background: #f8fafc;
+        }
+
+        .delete-note {
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #92400e;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .file-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .file-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .file-row:last-child {
+            border-bottom: none;
+        }
+
+        .file-name {
+            font-size: 12px;
+            color: #334155;
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            width: 100%;
+        }
+
+        .family-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 90;
+        }
+
+        .family-modal.visible {
+            display: flex;
+        }
+
+        .family-modal-card {
+            width: min(820px, 100%);
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            padding: 14px;
+            max-height: 86vh;
+            overflow: auto;
+        }
+
+        .family-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .family-modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .family-modal-list {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 8px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+        }
+
+        .family-modal-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 860px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
             }
 
-            .subtitle {
-                font-size: 14px;
+            .reference-picker-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .create-reference-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-lists {
+                grid-template-columns: 1fr;
+            }
+
+            .family-modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .main-card {
+                padding: 16px;
             }
 
             .search-box {
                 flex-direction: column;
-                gap: 8px;
             }
 
-            .search-button {
+            .search-box .btn {
                 width: 100%;
             }
 
-            .result-card {
-                padding: 18px;
-            }
-
-            .result-name {
-                font-size: 15px;
+            h1 {
+                font-size: 1.6rem;
             }
         }
     </style>
 </head>
+
 <body>
-    <div class="page-wrapper">
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <h2>Acceso Plataforma</h2>
+            <p class="auth-subtitle">Ingresa con tu usuario y contraseña para consultar documentos.</p>
+            <div class="input-group">
+                <label for="usernameInput">Usuario</label>
+                <input id="usernameInput" type="text" autocomplete="username" placeholder="Ej: ventas">
+            </div>
+            <div class="input-group">
+                <label for="passwordInput">Contraseña</label>
+                <input id="passwordInput" type="password" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button id="loginBtn" class="btn btn-primary" style="width:100%;">Iniciar sesión</button>
+            <div id="authError" class="auth-error"></div>
+        </div>
+    </div>
+
+    <div class="page-wrapper app-shell" id="appShell">
         <div class="main-card" id="mainCard">
+            <div class="top-actions">
+                <button id="roleBadge" class="btn btn-ghost" type="button">Rol: invitado</button>
+                <button id="logoutBtn" class="btn btn-ghost" type="button">Cerrar sesión</button>
+            </div>
+
             <div class="header-section">
-                <img 
-                    class="brand-logo" 
-                    src="./logo.jpg" 
-                    alt="Logo Comertex"
-                    onerror="this.style.display='none'; document.querySelector('.brand-logo-fallback').style.display='flex';"
-                >
-                <div class="brand-logo-fallback" style="display:none;">🏭</div>
-                <h1>Buscador de Fichas Técnicas</h1>
-                <p class="subtitle">Busca por SKU, nombre del producto o URL del PDF</p>
+                <img class="brand-logo" src="./logo.jpg" alt="Logo Comertex"
+                    onerror="this.style.display='none'; document.querySelector('.brand-logo-fallback').style.display='flex';">
+                <div class="brand-logo-fallback">🏭</div>
+                <h1>Buscador de Fichas y Ayuda Ventas</h1>
+                <p class="subtitle">Busca por SKU, nombre o enlace para descargar ambos documentos</p>
             </div>
 
             <div class="search-section">
                 <div class="search-box">
                     <div class="search-input-wrapper">
                         <div class="search-icon">🔍</div>
-                        <input 
-                            type="text" 
-                            id="searchInput" 
-                            placeholder="Escribe SKU, nombre o URL..."
-                            autocomplete="off"
-                        >
+                        <input type="text" id="searchInput" placeholder="Escribe SKU, nombre o URL..."
+                            autocomplete="off">
                         <div id="suggestions"></div>
                     </div>
-                    <button class="search-button" onclick="search()">Buscar</button>
+                    <button class="btn btn-primary" type="button" onclick="search()">Buscar</button>
                 </div>
             </div>
 
             <div id="results" class="results"></div>
+
+            <div class="admin-panel" id="adminPanel">
+                <h3>Panel de Desarrolladores</h3>
+                <p class="admin-sub">Sube, borra y sincroniza documentos de Fichas Técnicas y Ayuda Ventas.</p>
+
+                <div id="adminStatus" class="status-banner"></div>
+
+                <div class="admin-grid">
+                    <div class="input-group" style="margin-bottom:0;">
+                        <label for="apiUrlInput">URL Web App Apps Script</label>
+                        <input id="apiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+                    </div>
+                </div>
+
+                <div class="admin-step">
+                    <h4>1) Buscar referencia</h4>
+                    <div class="reference-picker-grid">
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="referenceSearchInput">Busca por SKU o nombre</label>
+                            <div class="reference-autocomplete" id="referenceAutocomplete">
+                                <input id="referenceSearchInput" type="text"
+                                    placeholder="Ej: SKU, nombre o parte del nombre..." autocomplete="off">
+                                <div id="referenceSuggestions" class="reference-suggestions"></div>
+                            </div>
+                        </div>
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="selectedReferenceDisplay">Referencia seleccionada</label>
+                            <div id="selectedReferenceDisplay" class="selected-reference-display">Sin referencia
+                                seleccionada</div>
+                        </div>
+                    </div>
+
+                    <div class="reference-picker-meta">
+                        <span id="referenceCount" class="reference-meta">0 referencias</span>
+                        <button id="clearReferenceSearchBtn" class="btn btn-ghost" type="button">Limpiar
+                            búsqueda</button>
+                    </div>
+
+                    <div id="referenceSummary" class="reference-summary">
+                        Selecciona una referencia para ver el estado de links.
+                    </div>
+
+                    <div id="familySummary" class="family-summary">
+                        Familia detectada: selecciona una referencia para ver su grupo de variantes.
+                    </div>
+
+                    <div class="family-controls">
+                        <button id="familySelectAllBtn" class="btn btn-ghost" type="button">Seleccionar todas</button>
+                        <button id="familyClearBtn" class="btn btn-ghost" type="button">Deseleccionar todas</button>
+                    </div>
+                    <div id="familyChecklist" class="family-list"></div>
+                </div>
+
+                <div class="admin-step">
+                    <h4>2) Subir PDF</h4>
+                    <div class="upload-grid">
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="docTypeSelect">Tipo de archivo</label>
+                            <select id="docTypeSelect">
+                                <option value="technical">Ficha técnica</option>
+                                <option value="salesAid">Ayuda ventas</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="fileInput">Archivo PDF</label>
+                            <input id="fileInput" type="file" accept="application/pdf">
+                        </div>
+                        <button id="uploadBtn" class="btn btn-primary" type="button">Subir archivo</button>
+                    </div>
+                </div>
+
+                <label class="inline-option" for="applyToColorVariants">
+                    <input id="applyToColorVariants" type="checkbox">
+                    Aplicar este PDF a todas las referencias del mismo nombre base (variantes por color).
+                </label>
+
+                <div class="create-reference-card">
+                    <h4>Crear nueva referencia</h4>
+                    <div class="create-reference-grid">
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="newSkuInput">SKU nuevo</label>
+                            <input id="newSkuInput" type="text" placeholder="Ej: CTX-0001">
+                        </div>
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="newNameInput">Nombre nuevo</label>
+                            <input id="newNameInput" type="text" placeholder="Ej: CAMISA MANGA LARGA COLOR AZUL">
+                        </div>
+                        <button id="createReferenceBtn" class="btn btn-ghost" type="button">Crear referencia</button>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <button id="refreshBtn" class="btn btn-ghost" type="button">Actualizar listados</button>
+                    <button id="syncBtn" class="btn btn-ghost" type="button">Sincronizar Sheet y data.json</button>
+                    <button id="openFamilyLinkModalBtn" class="btn btn-ghost" type="button">Ventana Relación
+                        Familiar</button>
+                </div>
+
+                <div class="admin-lists">
+                    <div class="file-list-card">
+                        <h4>Fichas técnicas</h4>
+                        <input id="techFileSearchInput" class="file-search-input" type="text"
+                            placeholder="Buscar referencia para borrar...">
+                        <div id="techFileList" class="file-list"></div>
+                    </div>
+                    <div class="file-list-card">
+                        <h4>Ayuda ventas</h4>
+                        <input id="salesFileSearchInput" class="file-search-input" type="text"
+                            placeholder="Buscar referencia para borrar...">
+                        <div id="salesFileList" class="file-list"></div>
+                    </div>
+                </div>
+                <div class="delete-note">Borrar elimina solo el PDF en Drive. La referencia SKU/NOMBRE en Excel no se
+                    elimina.</div>
+                <input id="replaceFileInput" type="file" accept="application/pdf" class="hidden">
+            </div>
+        </div>
+    </div>
+
+    <div id="familyLinkModal" class="family-modal">
+        <div class="family-modal-card">
+            <div class="family-modal-header">
+                <h3>Relacionar PDF por Familias</h3>
+                <button id="closeFamilyLinkModalBtn" class="btn btn-ghost" type="button">Cerrar</button>
+            </div>
+            <p class="admin-sub">Usa esta ventana para relacionar manualmente un mismo link de PDF a referencias
+                seleccionadas de una familia. Ideal cuando subes PDFs directo en Drive.</p>
+
+            <div class="family-modal-grid">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="familyLinkSourceSearchInput">Buscar referencia origen</label>
+                    <input id="familyLinkSourceSearchInput" class="file-search-input" type="text"
+                        placeholder="Filtra origen por SKU o nombre...">
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="familyLinkSourceSelect">Referencia origen (ya tiene link)</label>
+                    <select id="familyLinkSourceSelect">
+                        <option value="">Selecciona referencia...</option>
+                    </select>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="familyLinkDocTypeSelect">Tipo de documento</label>
+                    <select id="familyLinkDocTypeSelect">
+                        <option value="technical">Ficha técnica</option>
+                        <option value="salesAid">Ayuda ventas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="family-controls">
+                <button id="familyLinkSelectAllBtn" class="btn btn-ghost" type="button">Seleccionar todas</button>
+                <button id="familyLinkClearBtn" class="btn btn-ghost" type="button">Deseleccionar todas</button>
+            </div>
+            <input id="familyLinkSearchInput" class="file-search-input" type="text"
+                placeholder="Buscar dentro de la familia (SKU o nombre)...">
+            <div id="familyLinkList" class="family-modal-list"></div>
+
+            <div class="family-modal-actions">
+                <button id="applyFamilyLinkBtn" class="btn btn-primary" type="button">Aplicar Relación</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let allProducts = [];
+        const SESSION_KEY = 'docs_auth_session_v1';
+        const API_URL_KEY = 'docs_apps_script_url';
+        const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjV0m08h5VgSMsnFOfqeFpekBTRL3VdRwH1dj-skRfX7Lo3EiWozeMBZlPsXVgD2N62Q/exec';
+        const DEPRECATED_APPS_SCRIPT_URLS = [
+            'https://script.google.com/macros/s/AKfycbyKsh0zq7uwwuZl02UU63c823LkLAWO6nowpzVn0CJvdYQnf2HjtKi5ednLVdI_9pxudw/exec',
+            'https://script.google.com/macros/s/AKfycbwPB1PvSZpZtTcsvq-qHMFwK6QCgQ6KoGGEDfbuREDP389tJjfmObumutFWEfzP-9Y7lQ/exec',
+            'https://script.google.com/macros/s/AKfycbzNn4o04OR9lqtzrkxRFvUBPfCQqLBBUlyTgcJIaAsiUkpoC0vXzKbUrxYzflw3uPyLkQ/exec'
+        ];
 
-        // Cargar datos al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
+        // Autenticacion local basica para entorno estatico.
+        // Para produccion, mover a backend real con hash de contrasena.
+        const LOCAL_USERS = {
+            ventas: { password: 'ventas2026', role: 'viewer' },
+            developer: { password: 'dev2026', role: 'developer' }
+        };
+
+        let allProducts = [];
+        let allReferences = [];
+        let filteredReferences = [];
+        let technicalFilesCache = [];
+        let salesAidFilesCache = [];
+        let selectedReferenceRow = null;
+        let activeReferenceIndex = -1;
+        let pendingReplaceContext = null;
+        let selectedFamilyRows = [];
+        let familyLinkSelectedRows = [];
+        let familyLinkSourceSearchQuery = '';
+        let familyLinkSearchQuery = '';
+        let familyGroupOpenState = {
+            technical: {},
+            salesAid: {}
+        };
+        let currentSession = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            bindAuthEvents();
+            bindSearchEvents();
+            bindAdminEvents();
+            restoreSession();
             loadProducts();
-            
-            // Event listeners
+            displayEmpty();
+        });
+
+        function bindAuthEvents() {
+            document.getElementById('loginBtn').addEventListener('click', login);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('passwordInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        }
+
+        function bindSearchEvents() {
             const searchInput = document.getElementById('searchInput');
             const mainCard = document.getElementById('mainCard');
-            
+
             searchInput.addEventListener('keyup', updateSuggestions);
-            searchInput.addEventListener('keypress', function(e) {
+            searchInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     search();
                 }
             });
-            
-            // Animated gradient ring on focus
-            searchInput.addEventListener('focus', function() {
+
+            searchInput.addEventListener('focus', function () {
                 mainCard.classList.add('focus-active');
             });
-            
-            searchInput.addEventListener('blur', function() {
+
+            searchInput.addEventListener('blur', function () {
                 mainCard.classList.remove('focus-active');
             });
-            
-            document.addEventListener('click', function(e) {
+
+            document.addEventListener('click', function (e) {
                 if (e.target.id !== 'searchInput') {
                     hideSuggestions();
                 }
             });
-        });
+        }
 
-        function loadProducts() {
+        function bindAdminEvents() {
+            document.getElementById('uploadBtn').addEventListener('click', uploadDeveloperFile);
+            document.getElementById('createReferenceBtn').addEventListener('click', createDeveloperReference);
+            document.getElementById('refreshBtn').addEventListener('click', loadDeveloperLists);
+            document.getElementById('syncBtn').addEventListener('click', triggerSync);
+            document.getElementById('referenceSearchInput').addEventListener('input', filterReferences);
+            document.getElementById('referenceSearchInput').addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    moveReferenceSelection(1);
+                    return;
+                }
+
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    moveReferenceSelection(-1);
+                    return;
+                }
+
+                if (e.key === 'Escape') {
+                    hideReferenceSuggestions();
+                    return;
+                }
+
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    selectFirstFilteredReference();
+                }
+            });
+            document.getElementById('clearReferenceSearchBtn').addEventListener('click', clearReferenceSearch);
+            document.getElementById('techFileSearchInput').addEventListener('input', renderDeleteLists);
+            document.getElementById('salesFileSearchInput').addEventListener('input', renderDeleteLists);
+            document.getElementById('replaceFileInput').addEventListener('change', handleReplaceFileSelected);
+            document.getElementById('familySelectAllBtn').addEventListener('click', selectAllFamilyRows);
+            document.getElementById('familyClearBtn').addEventListener('click', clearAllFamilyRows);
+            document.getElementById('openFamilyLinkModalBtn').addEventListener('click', openFamilyLinkModal);
+            document.getElementById('closeFamilyLinkModalBtn').addEventListener('click', closeFamilyLinkModal);
+            document.getElementById('familyLinkSourceSearchInput').addEventListener('input', function () {
+                familyLinkSourceSearchQuery = normalizeForSearch(this.value || '');
+                renderFamilyLinkSourceOptions();
+            });
+            document.getElementById('familyLinkSourceSelect').addEventListener('change', renderFamilyLinkTargets);
+            document.getElementById('familyLinkDocTypeSelect').addEventListener('change', renderFamilyLinkTargets);
+            document.getElementById('familyLinkSearchInput').addEventListener('input', function () {
+                familyLinkSearchQuery = normalizeForSearch(this.value || '');
+                renderFamilyLinkTargets();
+            });
+            document.getElementById('familyLinkSelectAllBtn').addEventListener('click', selectAllFamilyLinkRows);
+            document.getElementById('familyLinkClearBtn').addEventListener('click', clearAllFamilyLinkRows);
+            document.getElementById('applyFamilyLinkBtn').addEventListener('click', applyFamilyLinkAssignment);
+
+            document.addEventListener('click', function (e) {
+                const root = document.getElementById('referenceAutocomplete');
+                if (root && !root.contains(e.target)) {
+                    hideReferenceSuggestions();
+                }
+
+                const modal = document.getElementById('familyLinkModal');
+                if (modal.classList.contains('visible') && e.target === modal) {
+                    closeFamilyLinkModal();
+                }
+            });
+
+            document.getElementById('apiUrlInput').addEventListener('change', function () {
+                localStorage.setItem(API_URL_KEY, this.value.trim());
+            });
+        }
+
+        function login() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const authError = document.getElementById('authError');
+
+            const user = LOCAL_USERS[username];
+            if (!user || user.password !== password) {
+                authError.textContent = 'Usuario o contraseña inválidos.';
+                return;
+            }
+
+            currentSession = { username: username, role: user.role };
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+            authError.textContent = '';
+            applySessionUI();
+        }
+
+        function logout() {
+            currentSession = null;
+            sessionStorage.removeItem(SESSION_KEY);
+            document.getElementById('authOverlay').classList.remove('hidden');
+            document.getElementById('appShell').style.display = 'none';
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function restoreSession() {
+            const sessionRaw = sessionStorage.getItem(SESSION_KEY);
+            if (!sessionRaw) {
+                return;
+            }
+
+            try {
+                currentSession = JSON.parse(sessionRaw);
+                applySessionUI();
+            } catch (error) {
+                currentSession = null;
+                sessionStorage.removeItem(SESSION_KEY);
+            }
+        }
+
+        function applySessionUI() {
+            const authOverlay = document.getElementById('authOverlay');
+            const appShell = document.getElementById('appShell');
+            const roleBadge = document.getElementById('roleBadge');
+            const adminPanel = document.getElementById('adminPanel');
+
+            if (!currentSession) {
+                authOverlay.classList.remove('hidden');
+                appShell.style.display = 'none';
+                adminPanel.style.display = 'none';
+                return;
+            }
+
+            authOverlay.classList.add('hidden');
+            appShell.style.display = 'flex';
+            roleBadge.textContent = 'Rol: ' + (currentSession.role === 'developer' ? 'desarrollador' : 'usuario');
+
+            const storedApiUrl = localStorage.getItem(API_URL_KEY) || '';
+            const savedApiUrl = DEPRECATED_APPS_SCRIPT_URLS.indexOf(storedApiUrl) !== -1
+                ? DEFAULT_APPS_SCRIPT_URL
+                : (storedApiUrl || DEFAULT_APPS_SCRIPT_URL);
+            document.getElementById('apiUrlInput').value = savedApiUrl;
+            localStorage.setItem(API_URL_KEY, savedApiUrl);
+
+            if (currentSession.role === 'developer') {
+                adminPanel.style.display = 'block';
+                loadDeveloperLists();
+            } else {
+                adminPanel.style.display = 'none';
+            }
+
+            loadProducts();
+        }
+
+        async function loadProducts() {
+            const loadedFromApi = await loadProductsFromApi();
+            if (loadedFromApi) {
+                return;
+            }
+
             fetch('data.json')
                 .then(response => response.json())
                 .then(data => {
                     allProducts = data;
-                    console.log(`✓ Cargados ${allProducts.length} productos`);
+                    console.log('Productos cargados desde data.json local:', allProducts.length);
                 })
                 .catch(error => {
                     console.error('Error cargando datos:', error);
                     displayError('No se pudieron cargar los datos. Verifica que data.json exista.');
                 });
+        }
+
+        async function loadProductsFromApi() {
+            if (!currentSession) {
+                return false;
+            }
+
+            const url = (document.getElementById('apiUrlInput').value || '').trim();
+            if (!url) {
+                return false;
+            }
+
+            try {
+                const response = await callAppsScript({ action: 'listReferences' });
+                const references = response.references || [];
+                allProducts = references.map(function (item) {
+                    return {
+                        sku: item.sku || '',
+                        name: item.name || '',
+                        pdf: item.technicalLink || '',
+                        salesAidPdf: item.salesAidLink || ''
+                    };
+                });
+                console.log('Productos cargados desde Apps Script:', allProducts.length);
+                return true;
+            } catch (error) {
+                console.warn('No se pudo cargar desde Apps Script, se usa data.json local:', error.message);
+                return false;
+            }
         }
 
         function updateSuggestions() {
@@ -509,32 +1351,42 @@
                 return;
             }
 
-            const filtered = allProducts.filter(p => 
-                p.sku.toLowerCase().includes(input) ||
-                p.name.toLowerCase().includes(input) ||
-                (p.pdf && p.pdf.toLowerCase().includes(input))
-            ).slice(0, 8);
+            const filtered = allProducts.filter(function (product) {
+                const techUrl = (product.pdf || '').toLowerCase();
+                const salesUrl = (product.salesAidPdf || '').toLowerCase();
+                return product.sku.toLowerCase().includes(input)
+                    || product.name.toLowerCase().includes(input)
+                    || techUrl.includes(input)
+                    || salesUrl.includes(input);
+            }).slice(0, 8);
 
             if (filtered.length === 0) {
                 hideSuggestions();
                 return;
             }
 
-            suggestionsDiv.innerHTML = filtered.map(p => `
-                <div class="suggestion-item" onclick="selectSuggestion('${p.sku.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}', '${(p.pdf || '').replace(/'/g, "\\'")}')">
-                    <div class="suggestion-sku">${escapeHtml(p.sku)}</div>
-                    <div class="suggestion-name">${escapeHtml(p.name.substring(0, 75))}</div>
-                </div>
-            `).join('');
+            suggestionsDiv.innerHTML = filtered.map(function (product) {
+                return '<div class="suggestion-item" onclick="selectSuggestion(\''
+                    + escapeJs(product.sku)
+                    + '\', \''
+                    + escapeJs(product.name)
+                    + '\', \''
+                    + escapeJs(product.pdf || '')
+                    + '\', \''
+                    + escapeJs(product.salesAidPdf || '')
+                    + '\')">'
+                    + '<div class="suggestion-sku">' + escapeHtml(product.sku) + '</div>'
+                    + '<div class="suggestion-name">' + escapeHtml(product.name.substring(0, 75)) + '</div>'
+                    + '</div>';
+            }).join('');
 
             suggestionsDiv.classList.add('visible');
         }
 
-        function selectSuggestion(sku, name, pdf) {
+        function selectSuggestion(sku, name, pdf, salesAidPdf) {
             document.getElementById('searchInput').value = name;
             hideSuggestions();
-            // Mostrar directamente el resultado con los datos que ya tenemos
-            displayResult({ sku, name, pdf });
+            displayResult({ sku: sku, name: name, pdf: pdf, salesAidPdf: salesAidPdf });
         }
 
         function hideSuggestions() {
@@ -550,13 +1402,16 @@
                 return;
             }
 
-            const found = allProducts.find(p => 
-                p.sku.toLowerCase() === searchLower ||
-                p.name.toLowerCase() === searchLower ||
-                p.sku.toLowerCase().includes(searchLower) ||
-                p.name.toLowerCase().includes(searchLower) ||
-                (p.pdf && p.pdf.toLowerCase().includes(searchLower))
-            );
+            const found = allProducts.find(function (product) {
+                const techUrl = (product.pdf || '').toLowerCase();
+                const salesUrl = (product.salesAidPdf || '').toLowerCase();
+                return product.sku.toLowerCase() === searchLower
+                    || product.name.toLowerCase() === searchLower
+                    || product.sku.toLowerCase().includes(searchLower)
+                    || product.name.toLowerCase().includes(searchLower)
+                    || techUrl.includes(searchLower)
+                    || salesUrl.includes(searchLower);
+            });
 
             if (found) {
                 displayResult(found);
@@ -568,67 +1423,1011 @@
         function displayResult(product) {
             const resultsDiv = document.getElementById('results');
             const pdfUrl = product.pdf || '';
-            
-            const buttonHtml = pdfUrl ? 
-                `<a href="${pdfUrl}" target="_blank" onclick="if(this.href) window.open(this.href); return false;">📥 Descargar Ficha</a>` :
-                '';
-            
-            resultsDiv.innerHTML = `
-                <div class="result-card success">
-                    <div class="result-header">
-                        <div class="result-icon">✓</div>
-                        <div class="result-text-section">
-                            <div class="result-sku">SKU: ${escapeHtml(product.sku)}</div>
-                            <div class="result-name">${escapeHtml(product.name)}</div>
-                            <div class="result-link">
-                                ${buttonHtml || '<span class="result-unavailable">Ficha técnica no disponible</span>'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            const salesAidUrl = product.salesAidPdf || '';
+
+            let actionsHtml = '';
+            if (pdfUrl) {
+                actionsHtml += '<a class="download-link tech" href="' + escapeAttribute(pdfUrl) + '" target="_blank" rel="noopener noreferrer">📥 Descargar Ficha</a>';
+            }
+            if (salesAidUrl) {
+                actionsHtml += '<a class="download-link sales" href="' + escapeAttribute(salesAidUrl) + '" target="_blank" rel="noopener noreferrer">🛍️ Descargar Ayuda Ventas</a>';
+            }
+
+            resultsDiv.innerHTML = '<div class="result-card success">'
+                + '<div class="result-header">'
+                + '<div class="result-icon">✓</div>'
+                + '<div class="result-text-section">'
+                + '<div class="result-sku">SKU: ' + escapeHtml(product.sku) + '</div>'
+                + '<div class="result-name">' + escapeHtml(product.name) + '</div>'
+                + '<div class="result-actions">'
+                + (actionsHtml || '<span class="result-unavailable">No hay documentos disponibles para este producto.</span>')
+                + '</div>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
         }
 
         function displayNotFound(query) {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="result-card error">
-                    <div class="result-header">
-                        <div class="result-icon">✕</div>
-                        <div class="result-text-section">
-                            <div class="error-state-title">No encontrado</div>
-                            <p style="margin-top: 8px; color: #64748B; font-size: 14px;">
-                                No hay coincidencias para: <strong>${escapeHtml(query)}</strong>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `;
+            resultsDiv.innerHTML = '<div class="result-card error">'
+                + '<div class="result-header">'
+                + '<div class="result-icon">✕</div>'
+                + '<div class="result-text-section">'
+                + '<div style="font-weight:700;color:#b91c1c;">No encontrado</div>'
+                + '<p style="margin-top:8px;color:#64748b;font-size:14px;">No hay coincidencias para: <strong>' + escapeHtml(query) + '</strong></p>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
         }
 
         function displayEmpty() {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📋</div>
-                    <p class="empty-state-text">Escribe algo para buscar una ficha técnica</p>
-                </div>
-            `;
+            resultsDiv.innerHTML = '<div class="empty-state">'
+                + '<div style="font-size:42px;margin-bottom:10px;">📂</div>'
+                + '<p>Escribe algo para buscar fichas técnicas o ayuda ventas</p>'
+                + '</div>';
         }
 
         function displayError(message) {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <div class="result-card error">
-                    <div class="error-state">
-                        <div class="error-state-title">⚠️ Error</div>
-                        <p style="margin-top: 8px; color: #64748B; font-size: 14px;">${message}</p>
-                    </div>
-                </div>
-            `;
+            resultsDiv.innerHTML = '<div class="result-card error">'
+                + '<div style="font-weight:700;color:#b91c1c;">Error</div>'
+                + '<p style="margin-top:8px;color:#64748b;font-size:14px;">' + escapeHtml(message) + '</p>'
+                + '</div>';
+        }
+
+        async function loadDeveloperLists() {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            try {
+                setAdminStatus('Cargando referencias y archivos...', false);
+                const responses = await Promise.all([
+                    callAppsScript({ action: 'listReferences' }),
+                    callAppsScript({ action: 'listFiles' })
+                ]);
+
+                const referencesResponse = responses[0];
+                const filesResponse = responses[1];
+                const prevSelectedRow = selectedReferenceRow;
+                allReferences = referencesResponse.references || [];
+                filteredReferences = allReferences.slice();
+                renderReferenceSelect(filteredReferences);
+                updateReferenceCount();
+                technicalFilesCache = filesResponse.technicalFiles || [];
+                salesAidFilesCache = filesResponse.salesAidFiles || [];
+
+                if (prevSelectedRow && allReferences.some(function (item) { return item.row === prevSelectedRow; })) {
+                    selectReferenceByRow(prevSelectedRow, false);
+                } else {
+                    selectedReferenceRow = null;
+                    updateSelectedReferenceDisplay();
+                    renderSelectedReferenceSummary();
+                }
+
+                renderDeleteLists();
+                renderFamilyLinkSourceOptions();
+                setAdminStatus('Panel actualizado. Selecciona referencia y sube PDF.', false);
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            }
+        }
+
+        function openFamilyLinkModal() {
+            if (!isDeveloper()) {
+                return;
+            }
+            familyLinkSourceSearchQuery = '';
+            document.getElementById('familyLinkSourceSearchInput').value = '';
+            familyLinkSearchQuery = '';
+            document.getElementById('familyLinkSearchInput').value = '';
+            renderFamilyLinkSourceOptions();
+            document.getElementById('familyLinkModal').classList.add('visible');
+        }
+
+        function closeFamilyLinkModal() {
+            document.getElementById('familyLinkModal').classList.remove('visible');
+        }
+
+        function renderFamilyLinkSourceOptions() {
+            const select = document.getElementById('familyLinkSourceSelect');
+            const previous = select.value;
+            const filteredSources = allReferences.filter(function (item) {
+                if (!familyLinkSourceSearchQuery) {
+                    return true;
+                }
+                return normalizeForSearch(buildReferenceLabel(item)).includes(familyLinkSourceSearchQuery);
+            });
+
+            select.innerHTML = '<option value="">Selecciona referencia...</option>' + filteredSources.map(function (item) {
+                const label = (item.sku ? item.sku + ' - ' : '') + (item.name || '');
+                return '<option value="' + item.row + '">' + escapeHtml(label.substring(0, 140)) + '</option>';
+            }).join('');
+
+            if (previous && filteredSources.some(function (item) { return String(item.row) === previous; })) {
+                select.value = previous;
+            }
+
+            renderFamilyLinkTargets();
+        }
+
+        function getFamilyLinkSourceReference() {
+            const row = Number(document.getElementById('familyLinkSourceSelect').value || 0);
+            if (row < 2) {
+                return null;
+            }
+            return allReferences.find(function (item) { return item.row === row; }) || null;
+        }
+
+        function renderFamilyLinkTargets() {
+            const source = getFamilyLinkSourceReference();
+            const list = document.getElementById('familyLinkList');
+            if (!source) {
+                familyLinkSelectedRows = [];
+                list.innerHTML = '<div class="family-item">Selecciona una referencia origen.</div>';
+                return;
+            }
+
+            const names = allReferences.map(function (item) { return item.name || ''; });
+            const base = extractReferenceBaseNameClient(source.name || '', names);
+            const family = allReferences.filter(function (item) {
+                const candidateBase = extractReferenceBaseNameClient(item.name || '', names);
+                return areBaseNamesRelatedClient(base, candidateBase);
+            });
+
+            const filteredFamily = family.filter(function (item) {
+                if (!familyLinkSearchQuery) {
+                    return true;
+                }
+                const label = normalizeForSearch(buildReferenceLabel(item));
+                return label.includes(familyLinkSearchQuery);
+            });
+
+            if (!familyLinkSelectedRows.length) {
+                familyLinkSelectedRows = family.map(function (item) { return item.row; });
+            } else {
+                familyLinkSelectedRows = familyLinkSelectedRows.filter(function (row) {
+                    return family.some(function (item) { return item.row === row; });
+                });
+                if (!familyLinkSelectedRows.length) {
+                    familyLinkSelectedRows = family.map(function (item) { return item.row; });
+                }
+            }
+
+            if (!filteredFamily.length) {
+                list.innerHTML = '<div class="family-item">Sin resultados para la búsqueda actual.</div>';
+                return;
+            }
+
+            list.innerHTML = filteredFamily.map(function (item) {
+                const checked = familyLinkSelectedRows.indexOf(item.row) !== -1 ? 'checked' : '';
+                return '<label class="family-item">'
+                    + '<input type="checkbox" data-family-link-row="' + item.row + '" ' + checked + ' onchange="toggleFamilyLinkRow(' + item.row + ')">'
+                    + '<span>' + escapeHtml(buildReferenceLabel(item)) + '</span>'
+                    + '</label>';
+            }).join('');
+        }
+
+        function toggleFamilyLinkRow(row) {
+            const value = Number(row);
+            const idx = familyLinkSelectedRows.indexOf(value);
+            if (idx >= 0) {
+                familyLinkSelectedRows.splice(idx, 1);
+            } else {
+                familyLinkSelectedRows.push(value);
+            }
+        }
+
+        function selectAllFamilyLinkRows() {
+            const source = getFamilyLinkSourceReference();
+            if (!source) {
+                return;
+            }
+            const names = allReferences.map(function (item) { return item.name || ''; });
+            const base = extractReferenceBaseNameClient(source.name || '', names);
+            const family = allReferences.filter(function (item) {
+                const candidateBase = extractReferenceBaseNameClient(item.name || '', names);
+                return areBaseNamesRelatedClient(base, candidateBase);
+            });
+
+            const targetRows = family.filter(function (item) {
+                if (!familyLinkSearchQuery) {
+                    return true;
+                }
+                return normalizeForSearch(buildReferenceLabel(item)).includes(familyLinkSearchQuery);
+            }).map(function (item) { return item.row; });
+
+            const union = {};
+            familyLinkSelectedRows.forEach(function (row) { union[row] = true; });
+            targetRows.forEach(function (row) { union[row] = true; });
+            familyLinkSelectedRows = Object.keys(union).map(function (key) { return Number(key); });
+            renderFamilyLinkTargets();
+        }
+
+        function clearAllFamilyLinkRows() {
+            const source = getFamilyLinkSourceReference();
+            if (!source) {
+                familyLinkSelectedRows = [];
+                renderFamilyLinkTargets();
+                return;
+            }
+
+            const names = allReferences.map(function (item) { return item.name || ''; });
+            const base = extractReferenceBaseNameClient(source.name || '', names);
+            const family = allReferences.filter(function (item) {
+                const candidateBase = extractReferenceBaseNameClient(item.name || '', names);
+                return areBaseNamesRelatedClient(base, candidateBase);
+            });
+
+            const rowsToRemove = family.filter(function (item) {
+                if (!familyLinkSearchQuery) {
+                    return true;
+                }
+                return normalizeForSearch(buildReferenceLabel(item)).includes(familyLinkSearchQuery);
+            }).map(function (item) { return item.row; });
+
+            familyLinkSelectedRows = familyLinkSelectedRows.filter(function (row) {
+                return rowsToRemove.indexOf(row) === -1;
+            });
+            renderFamilyLinkTargets();
+        }
+
+        async function applyFamilyLinkAssignment() {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            const source = getFamilyLinkSourceReference();
+            const docType = document.getElementById('familyLinkDocTypeSelect').value;
+            if (!source) {
+                setAdminStatus('Selecciona una referencia origen para relacionar.', true);
+                return;
+            }
+            if (!familyLinkSelectedRows.length) {
+                setAdminStatus('Selecciona al menos una referencia destino.', true);
+                return;
+            }
+
+            try {
+                setAdminStatus('Aplicando relación familiar manual...', false);
+                const result = await callAppsScript({
+                    action: 'applyFamilyLinks',
+                    docType: docType,
+                    sourceRow: source.row,
+                    targetRows: familyLinkSelectedRows
+                });
+                setAdminStatus('Relación aplicada. Filas actualizadas: ' + (result.updatedRows || []).length + '.', false);
+                await loadDeveloperLists();
+                await loadProducts();
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            }
+        }
+
+        async function uploadDeveloperFile() {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const docType = document.getElementById('docTypeSelect').value;
+            const selectedReference = getSelectedReference();
+
+            if (!file) {
+                setAdminStatus('Selecciona un archivo PDF para subir.', true);
+                return;
+            }
+
+            if (!selectedReference) {
+                setAdminStatus('Selecciona una referencia del Excel antes de subir el archivo.', true);
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                setAdminStatus('Solo se permiten archivos PDF.', true);
+                return;
+            }
+
+            const base64 = await fileToBase64(file);
+            const applyToColorVariants = document.getElementById('applyToColorVariants').checked;
+            const targetRows = getTargetRowsForUploadClient(selectedReference, applyToColorVariants);
+
+            try {
+                setAdminStatus('Subiendo archivo y actualizando Excel...', false);
+                const response = await callAppsScript({
+                    action: 'uploadReferenceDocument',
+                    docType: docType,
+                    referenceRow: selectedReference.row,
+                    referenceSku: selectedReference.sku,
+                    referenceName: selectedReference.name,
+                    applyToColorVariants: applyToColorVariants,
+                    targetRows: targetRows,
+                    fileName: file.name,
+                    mimeType: file.type,
+                    fileContentBase64: base64
+                });
+                fileInput.value = '';
+                const affectedRows = response.updatedRows ? response.updatedRows.length : 1;
+                setAdminStatus('Archivo subido. Filas actualizadas: ' + affectedRows + '. data.json sincronizado.', false);
+                await loadDeveloperLists();
+                await loadProducts();
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            }
+        }
+
+        async function createDeveloperReference() {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            const skuInput = document.getElementById('newSkuInput');
+            const nameInput = document.getElementById('newNameInput');
+            const sku = (skuInput.value || '').trim();
+            const name = (nameInput.value || '').trim();
+
+            if (!sku || !name) {
+                setAdminStatus('Para crear una referencia debes ingresar SKU y nombre.', true);
+                return;
+            }
+
+            try {
+                setAdminStatus('Creando referencia en Excel y sincronizando...', false);
+                const response = await callAppsScript({
+                    action: 'createReference',
+                    sku: sku,
+                    name: name
+                });
+
+                skuInput.value = '';
+                nameInput.value = '';
+
+                await loadDeveloperLists();
+                const createdRow = response.reference ? String(response.reference.row) : '';
+                if (createdRow) {
+                    selectReferenceByRow(Number(createdRow), false);
+                }
+                await loadProducts();
+
+                setAdminStatus('Referencia creada correctamente en la fila ' + createdRow + '.', false);
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            }
+        }
+
+        async function deleteDeveloperFile(fileId, docType, referenceLabel) {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            const typeLabel = docType === 'salesAid' ? 'Ayuda ventas' : 'Ficha técnica';
+            const preview = referenceLabel || 'Referencia no identificada';
+            const message = 'Se borrará solo el PDF de ' + typeLabel + ' en Drive para: ' + preview + '.\n\nLa referencia en Excel NO se eliminará.\n\n¿Deseas continuar?';
+            if (!confirm(message)) {
+                return;
+            }
+
+            try {
+                setAdminStatus('Borrando archivo...', false);
+                await callAppsScript({ action: 'deleteFile', fileId: fileId });
+                setAdminStatus('PDF eliminado en Drive. La referencia en Excel se mantiene.', false);
+                await loadDeveloperLists();
+                await loadProducts();
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            }
+        }
+
+        function startReplaceDeveloperFile(fileId, docType, applyToColorVariants) {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            const reference = getReferenceByFile(fileId, docType);
+            if (!reference) {
+                setAdminStatus('No se pudo ubicar la referencia de este PDF para actualizarlo.', true);
+                return;
+            }
+
+            pendingReplaceContext = {
+                oldFileId: fileId,
+                docType: docType,
+                applyToColorVariants: Boolean(applyToColorVariants),
+                reference: reference
+            };
+
+            const input = document.getElementById('replaceFileInput');
+            input.value = '';
+            input.click();
+        }
+
+        async function handleReplaceFileSelected(event) {
+            const context = pendingReplaceContext;
+            pendingReplaceContext = null;
+
+            if (!context) {
+                return;
+            }
+
+            const file = event.target.files && event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                setAdminStatus('Solo se permiten archivos PDF.', true);
+                return;
+            }
+
+            try {
+                const modeLabel = context.applyToColorVariants ? 'todas las variantes de color' : 'solo esta referencia';
+                setAdminStatus('Actualizando PDF para ' + modeLabel + '...', false);
+                const base64 = await fileToBase64(file);
+
+                const uploadResult = await callAppsScript({
+                    action: 'uploadReferenceDocument',
+                    docType: context.docType,
+                    referenceRow: context.reference.row,
+                    referenceSku: context.reference.sku,
+                    referenceName: context.reference.name,
+                    applyToColorVariants: context.applyToColorVariants,
+                    targetRows: context.applyToColorVariants ? getTargetRowsForUploadClient(context.reference, true) : [context.reference.row],
+                    fileName: file.name,
+                    mimeType: file.type,
+                    fileContentBase64: base64
+                });
+
+                // Se elimina el PDF anterior despues de actualizar links para que no queden duplicados.
+                await callAppsScript({ action: 'deleteFile', fileId: context.oldFileId });
+
+                const affectedRows = uploadResult.updatedRows ? uploadResult.updatedRows.length : 1;
+                setAdminStatus('PDF actualizado correctamente. Filas afectadas: ' + affectedRows + '.', false);
+                await loadDeveloperLists();
+                await loadProducts();
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        function renderDeleteLists() {
+            const techQuery = (document.getElementById('techFileSearchInput').value || '').trim().toLowerCase();
+            const salesQuery = (document.getElementById('salesFileSearchInput').value || '').trim().toLowerCase();
+
+            const filteredTech = filterFilesForDelete(technicalFilesCache, 'technical', techQuery);
+            const filteredSales = filterFilesForDelete(salesAidFilesCache, 'salesAid', salesQuery);
+
+            renderFileList('techFileList', filteredTech, 'technical');
+            renderFileList('salesFileList', filteredSales, 'salesAid');
+        }
+
+        function filterFilesForDelete(files, docType, query) {
+            if (!query) {
+                return files;
+            }
+
+            return files.filter(function (file) {
+                const referenceLabel = getReferenceLabelByFile(file.id, docType).toLowerCase();
+                const fileName = (file.name || '').toLowerCase();
+                return referenceLabel.includes(query) || fileName.includes(query);
+            });
+        }
+
+        async function triggerSync() {
+            if (!isDeveloper()) {
+                return;
+            }
+
+            try {
+                setAdminStatus('Sincronizando Sheet y data.json...', false);
+                const result = await callAppsScript({ action: 'sync' });
+                setAdminStatus('Sincronización OK. Registros en data.json: ' + (result.totalProducts || 0), false);
+                await loadProducts();
+                await loadDeveloperLists();
+            } catch (error) {
+                setAdminStatus(error.message, true);
+            }
+        }
+
+        function renderReferenceSelect(references) {
+            const suggestions = document.getElementById('referenceSuggestions');
+            activeReferenceIndex = -1;
+
+            if (!references.length) {
+                suggestions.innerHTML = '<div class="reference-suggestion">No hay coincidencias.</div>';
+                showReferenceSuggestions();
+                return;
+            }
+
+            suggestions.innerHTML = references.slice(0, 80).map(function (item, index) {
+                const label = (item.sku ? item.sku + ' - ' : '') + item.name;
+                return '<div class="reference-suggestion" data-index="' + index + '" data-row="' + item.row + '" onclick="selectReferenceByRow(' + item.row + ', true)">' + escapeHtml(label.substring(0, 140)) + '</div>';
+            }).join('');
+
+            showReferenceSuggestions();
+        }
+
+        function filterReferences() {
+            const query = (document.getElementById('referenceSearchInput').value || '').trim().toLowerCase();
+            if (!query) {
+                filteredReferences = allReferences.slice();
+            } else {
+                filteredReferences = allReferences.filter(function (item) {
+                    const sku = (item.sku || '').toLowerCase();
+                    const name = (item.name || '').toLowerCase();
+                    return sku.includes(query) || name.includes(query);
+                });
+            }
+
+            renderReferenceSelect(filteredReferences);
+            updateReferenceCount();
+
+            if (filteredReferences.length === 1) {
+                selectReferenceByRow(filteredReferences[0].row, false);
+            }
+        }
+
+        function selectFirstFilteredReference() {
+            if (!filteredReferences.length) {
+                return;
+            }
+
+            if (activeReferenceIndex >= 0 && activeReferenceIndex < filteredReferences.length) {
+                selectReferenceByRow(filteredReferences[activeReferenceIndex].row, true);
+                return;
+            }
+
+            selectReferenceByRow(filteredReferences[0].row, true);
+        }
+
+        function clearReferenceSearch() {
+            document.getElementById('referenceSearchInput').value = '';
+            filteredReferences = allReferences.slice();
+            renderReferenceSelect(filteredReferences);
+            updateReferenceCount();
+            document.getElementById('referenceSearchInput').focus();
+        }
+
+        function moveReferenceSelection(direction) {
+            if (!filteredReferences.length) {
+                return;
+            }
+
+            activeReferenceIndex = activeReferenceIndex + direction;
+            if (activeReferenceIndex < 0) {
+                activeReferenceIndex = filteredReferences.length - 1;
+            }
+            if (activeReferenceIndex >= filteredReferences.length) {
+                activeReferenceIndex = 0;
+            }
+
+            renderReferenceActiveState();
+        }
+
+        function renderReferenceActiveState() {
+            const rows = document.querySelectorAll('#referenceSuggestions .reference-suggestion[data-index]');
+            rows.forEach(function (node) {
+                node.classList.remove('active');
+            });
+
+            const activeNode = document.querySelector('#referenceSuggestions .reference-suggestion[data-index="' + activeReferenceIndex + '"]');
+            if (activeNode) {
+                activeNode.classList.add('active');
+                activeNode.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function selectReferenceByRow(rowNumber, closeSuggestions) {
+            const row = Number(rowNumber);
+            const found = allReferences.find(function (item) { return item.row === row; }) || null;
+            selectedReferenceRow = found ? found.row : null;
+
+            if (found) {
+                document.getElementById('referenceSearchInput').value = ((found.sku ? found.sku + ' - ' : '') + found.name);
+            }
+
+            updateSelectedReferenceDisplay();
+            renderSelectedReferenceSummary();
+
+            if (closeSuggestions) {
+                hideReferenceSuggestions();
+            }
+        }
+
+        function updateSelectedReferenceDisplay() {
+            const box = document.getElementById('selectedReferenceDisplay');
+            const ref = getSelectedReference();
+
+            if (!ref) {
+                box.textContent = 'Sin referencia seleccionada';
+                return;
+            }
+
+            const label = (ref.sku ? ref.sku + ' - ' : '') + ref.name;
+            box.textContent = label;
+        }
+
+        function showReferenceSuggestions() {
+            const panel = document.getElementById('referenceSuggestions');
+            if (panel.innerHTML.trim()) {
+                panel.classList.add('visible');
+            }
+        }
+
+        function hideReferenceSuggestions() {
+            document.getElementById('referenceSuggestions').classList.remove('visible');
+            activeReferenceIndex = -1;
+        }
+
+        function updateReferenceCount() {
+            const total = allReferences.length;
+            const visible = filteredReferences.length;
+            const label = visible + ' visibles de ' + total + ' referencias';
+            document.getElementById('referenceCount').textContent = label;
+        }
+
+        function renderSelectedReferenceSummary() {
+            const summary = document.getElementById('referenceSummary');
+            const ref = getSelectedReference();
+
+            if (!ref) {
+                summary.innerHTML = 'Selecciona una referencia para ver el estado de links.';
+                renderFamilySummary(null);
+                return;
+            }
+
+            summary.innerHTML = '<strong>Referencia:</strong> ' + escapeHtml(ref.sku + ' - ' + ref.name)
+                + '<br><strong>Ficha técnica:</strong> ' + (ref.technicalLink ? 'Registrada' : 'Pendiente')
+                + '<br><strong>Ayuda ventas:</strong> ' + (ref.salesAidLink ? 'Registrada' : 'Pendiente');
+
+            renderFamilySummary(ref);
+        }
+
+        function renderFamilySummary(reference) {
+            const box = document.getElementById('familySummary');
+            const checklist = document.getElementById('familyChecklist');
+            if (!reference) {
+                box.textContent = 'Familia detectada: selecciona una referencia para ver su grupo de variantes.';
+                checklist.innerHTML = '';
+                selectedFamilyRows = [];
+                return;
+            }
+
+            const names = allReferences.map(function (item) { return item.name || ''; });
+            const base = extractReferenceBaseNameClient(reference.name || '', names);
+            const family = allReferences.filter(function (item) {
+                const candidateBase = extractReferenceBaseNameClient(item.name || '', names);
+                return areBaseNamesRelatedClient(base, candidateBase);
+            });
+
+            const skuPreview = family.slice(0, 6).map(function (item) {
+                return item.sku || '(sin sku)';
+            }).join(', ');
+            const more = family.length > 6 ? ' +' + (family.length - 6) + ' más' : '';
+
+            box.innerHTML = '<strong>Familia detectada:</strong> ' + escapeHtml(base || (reference.name || ''))
+                + '<br><strong>Variantes relacionadas:</strong> ' + family.length
+                + '<br><strong>SKUs:</strong> ' + escapeHtml(skuPreview + more);
+
+            selectedFamilyRows = family.map(function (item) { return item.row; });
+            renderFamilyChecklist(family);
+        }
+
+        function renderFamilyChecklist(family) {
+            const checklist = document.getElementById('familyChecklist');
+            if (!family.length) {
+                checklist.innerHTML = '<div class="family-item">Sin variantes detectadas.</div>';
+                return;
+            }
+
+            checklist.innerHTML = family.map(function (item) {
+                const checked = selectedFamilyRows.indexOf(item.row) !== -1 ? 'checked' : '';
+                const label = (item.sku ? item.sku + ' - ' : '') + (item.name || '');
+                return '<label class="family-item">'
+                    + '<input type="checkbox" data-family-row="' + item.row + '" ' + checked + ' onchange="toggleFamilyRow(' + item.row + ')">'
+                    + '<span>' + escapeHtml(label) + '</span>'
+                    + '</label>';
+            }).join('');
+        }
+
+        function toggleFamilyRow(row) {
+            const value = Number(row);
+            const idx = selectedFamilyRows.indexOf(value);
+            if (idx >= 0) {
+                selectedFamilyRows.splice(idx, 1);
+            } else {
+                selectedFamilyRows.push(value);
+            }
+        }
+
+        function selectAllFamilyRows() {
+            const ref = getSelectedReference();
+            if (!ref) {
+                return;
+            }
+            const names = allReferences.map(function (item) { return item.name || ''; });
+            const base = extractReferenceBaseNameClient(ref.name || '', names);
+            const family = allReferences.filter(function (item) {
+                const candidateBase = extractReferenceBaseNameClient(item.name || '', names);
+                return areBaseNamesRelatedClient(base, candidateBase);
+            });
+            selectedFamilyRows = family.map(function (item) { return item.row; });
+            renderFamilyChecklist(family);
+        }
+
+        function clearAllFamilyRows() {
+            const ref = getSelectedReference();
+            if (!ref) {
+                return;
+            }
+            selectedFamilyRows = [];
+            const names = allReferences.map(function (item) { return item.name || ''; });
+            const base = extractReferenceBaseNameClient(ref.name || '', names);
+            const family = allReferences.filter(function (item) {
+                const candidateBase = extractReferenceBaseNameClient(item.name || '', names);
+                return areBaseNamesRelatedClient(base, candidateBase);
+            });
+            renderFamilyChecklist(family);
+        }
+
+        function getTargetRowsForUploadClient(reference, applyToColorVariants) {
+            if (!reference) {
+                return [];
+            }
+            if (!applyToColorVariants) {
+                return [reference.row];
+            }
+            if (selectedFamilyRows.length) {
+                return selectedFamilyRows.slice();
+            }
+            return [reference.row];
+        }
+
+        function tokenizeReferenceNameClient(value) {
+            return String(value || '')
+                .toLowerCase()
+                .replace(/\.pdf$/i, '')
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .split(' ')
+                .filter(function (token) { return token; });
+        }
+
+        function findColorMarkerIndexClient(tokens) {
+            for (let i = 0; i < tokens.length; i++) {
+                if (tokens[i] === 'color' || tokens[i] === 'colores') {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        function startsWithTokensClient(fullTokens, prefixTokens) {
+            if (prefixTokens.length > fullTokens.length) {
+                return false;
+            }
+            for (let i = 0; i < prefixTokens.length; i++) {
+                if (fullTokens[i] !== prefixTokens[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function commonPrefixLengthClient(aTokens, bTokens) {
+            const len = Math.min(aTokens.length, bTokens.length);
+            let count = 0;
+            for (let i = 0; i < len; i++) {
+                if (aTokens[i] !== bTokens[i]) {
+                    break;
+                }
+                count++;
+            }
+            return count;
+        }
+
+        function extractReferenceBaseNameClient(value, relatedNames) {
+            const tokens = tokenizeReferenceNameClient(value);
+            if (!tokens.length) {
+                return '';
+            }
+
+            const markerIndex = findColorMarkerIndexClient(tokens);
+            if (markerIndex > 0) {
+                return tokens.slice(0, markerIndex).join(' ');
+            }
+
+            const peerTokenLists = (relatedNames || []).map(function (name) {
+                return tokenizeReferenceNameClient(name);
+            });
+
+            for (let len = tokens.length - 1; len >= 1; len--) {
+                const prefix = tokens.slice(0, len);
+                const variantHeads = {};
+                let candidateCount = 0;
+
+                for (let i = 0; i < peerTokenLists.length; i++) {
+                    const peerTokens = peerTokenLists[i];
+                    if (!peerTokens.length || !startsWithTokensClient(peerTokens, prefix)) {
+                        continue;
+                    }
+                    if (peerTokens.length <= len) {
+                        continue;
+                    }
+                    candidateCount++;
+                    variantHeads[peerTokens[len]] = true;
+                }
+
+                const uniqueVariantHeads = Object.keys(variantHeads).length;
+                const allowSingleWordBase = len === 1 && tokens.length === 2;
+                const isStrongPrefix = len >= 2 || allowSingleWordBase;
+                if (isStrongPrefix && candidateCount >= 2 && uniqueVariantHeads >= 2) {
+                    return prefix.join(' ');
+                }
+            }
+
+            return tokens.join(' ');
+        }
+
+        function areBaseNamesRelatedClient(baseA, baseB) {
+            if (!baseA || !baseB) {
+                return false;
+            }
+            if (baseA === baseB || baseA.includes(baseB) || baseB.includes(baseA)) {
+                return true;
+            }
+
+            const tokensA = tokenizeReferenceNameClient(baseA);
+            const tokensB = tokenizeReferenceNameClient(baseB);
+            const prefixLen = commonPrefixLengthClient(tokensA, tokensB);
+            if (prefixLen >= 2) {
+                return true;
+            }
+            return prefixLen === 1 && tokensA.length === 1 && tokensB.length === 1;
+        }
+
+        function getSelectedReference() {
+            if (!selectedReferenceRow) {
+                return null;
+            }
+
+            return allReferences.find(function (item) { return item.row === selectedReferenceRow; }) || null;
+        }
+
+        function renderFileList(containerId, files, docType) {
+            const container = document.getElementById(containerId);
+            if (!files.length) {
+                container.innerHTML = '<div class="file-row"><span class="file-name">Sin archivos.</span></div>';
+                return;
+            }
+            container.innerHTML = files.map(function (file) {
+                const referenceLabel = getReferenceLabelByFile(file.id, docType);
+                return '<div class="file-row">'
+                    + '<span class="file-name">' + escapeHtml(referenceLabel) + '</span>'
+                    + '<div class="file-actions">'
+                    + '<button class="btn btn-ghost" type="button" onclick="startReplaceDeveloperFile(\'' + escapeJs(file.id) + '\', \'' + escapeJs(docType) + '\', false)">Actualizar</button>'
+                    + '<button class="btn btn-danger" type="button" onclick="deleteDeveloperFile(\'' + escapeJs(file.id) + '\', \'' + escapeJs(docType) + '\', \'' + escapeJs(referenceLabel) + '\')">Borrar PDF</button>'
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        }
+
+        function buildReferenceLabel(reference) {
+            if (!reference) {
+                return '';
+            }
+            const sku = (reference.sku || '').trim();
+            const name = (reference.name || '').trim();
+            return (sku ? sku + ' - ' : '') + name;
+        }
+
+        function normalizeForSearch(value) {
+            return String(value || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
+        }
+
+        function getReferenceLabelByFile(fileId, docType) {
+            const reference = getReferenceByFile(fileId, docType);
+
+            if (!reference) {
+                return 'Referencia no identificada';
+            }
+            return buildReferenceLabel(reference);
+        }
+
+        function getReferenceByFile(fileId, docType) {
+            return allReferences.find(function (item) {
+                const link = docType === 'technical' ? item.technicalLink : item.salesAidLink;
+                return extractDriveIdFromUrl(link) === fileId;
+            }) || null;
+        }
+
+        function extractDriveIdFromUrl(url) {
+            const value = String(url || '');
+            const match = value.match(/[?&]id=([^&]+)/);
+            return match ? match[1] : '';
+        }
+
+        function setAdminStatus(message, isError) {
+            const status = document.getElementById('adminStatus');
+            status.textContent = message;
+            status.className = 'status-banner ' + (isError ? 'status-error' : 'status-ok');
+        }
+
+        function isDeveloper() {
+            return currentSession && currentSession.role === 'developer';
+        }
+
+        async function callAppsScript(payload) {
+            const url = (document.getElementById('apiUrlInput').value || '').trim();
+            if (!url) {
+                throw new Error('Configura la URL de la Web App de Apps Script en el panel de desarrollador.');
+            }
+
+            localStorage.setItem(API_URL_KEY, url);
+
+            const requestPayload = Object.assign({}, payload, {
+                username: currentSession ? currentSession.username : '',
+                password: getCurrentPasswordForApi()
+            });
+
+            let response;
+            try {
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    },
+                    body: JSON.stringify(requestPayload)
+                });
+            } catch (error) {
+                throw new Error('No se pudo conectar con Apps Script (Failed to fetch). Revisa que el deployment este publicado como Web App con acceso Cualquier persona y que la URL /exec sea correcta.');
+            }
+
+            if (!response.ok) {
+                throw new Error('No fue posible conectar con Apps Script. Estado: ' + response.status);
+            }
+
+            const result = await response.json();
+            if (!result.ok) {
+                throw new Error(result.error || 'Error desconocido en Apps Script.');
+            }
+
+            return result;
+        }
+
+        function getCurrentPasswordForApi() {
+            if (!currentSession) {
+                return '';
+            }
+            const localUser = LOCAL_USERS[currentSession.username];
+            return localUser ? localUser.password : '';
+        }
+
+        function fileToBase64(file) {
+            return new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const full = reader.result || '';
+                    const commaIndex = full.indexOf(',');
+                    resolve(commaIndex >= 0 ? full.substring(commaIndex + 1) : full);
+                };
+                reader.onerror = function () {
+                    reject(new Error('No se pudo leer el archivo seleccionado.'));
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         function escapeHtml(text) {
+            const value = String(text || '');
             const map = {
                 '&': '&amp;',
                 '<': '&lt;',
@@ -636,8 +2435,17 @@
                 '"': '&quot;',
                 "'": '&#039;'
             };
-            return text.replace(/[&<>"']/g, m => map[m]);
+            return value.replace(/[&<>"']/g, function (m) { return map[m]; });
+        }
+
+        function escapeAttribute(text) {
+            return String(text || '').replace(/"/g, '&quot;');
+        }
+
+        function escapeJs(text) {
+            return String(text || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
     </script>
 </body>
+
 </html>

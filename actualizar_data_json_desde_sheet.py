@@ -4,6 +4,7 @@ import io
 import json
 import shutil
 import subprocess
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -26,7 +27,7 @@ def load_rows(csv_url: str):
     try:
         with urllib.request.urlopen(csv_url, timeout=30) as response:
             raw = response.read().decode("utf-8", errors="replace")
-    except Exception:
+    except (urllib.error.URLError, TimeoutError, ValueError):
         result = subprocess.run(
             [CURL_BIN, "-L", "--silent", csv_url],
             check=True,
@@ -53,21 +54,28 @@ def main() -> None:
     header = [normalize_header(column) for column in rows[0]]
     sku_idx = 0
     name_idx = 1
-    link_idx = 2
+    tech_link_idx = 2
+    sales_link_idx = 3
 
     for index, column in enumerate(header):
         if "sku" in column:
             sku_idx = index
         elif "nombre" in column or "name" in column:
             name_idx = index
-        elif "link" in column or "pdf" in column:
-            link_idx = index
+        elif ("link" in column or "pdf" in column) and (
+            "ayuda" not in column and "ventas" not in column and "venta" not in column
+        ):
+            tech_link_idx = index
+        elif "ayuda" in column or "ventas" in column or "venta" in column:
+            sales_link_idx = index
 
     products = []
     for row in rows[1:]:
         sku = row[sku_idx].strip() if sku_idx < len(row) else ""
         name = row[name_idx].strip() if name_idx < len(row) else ""
-        pdf = row[link_idx].strip() if link_idx < len(row) else ""
+        pdf = row[tech_link_idx].strip() if tech_link_idx < len(row) else ""
+        sales_aid_pdf = row[sales_link_idx].strip(
+        ) if sales_link_idx < len(row) else ""
 
         if not sku and not name:
             continue
@@ -76,9 +84,11 @@ def main() -> None:
             "sku": sku,
             "name": name,
             "pdf": pdf,
+            "salesAidPdf": sales_aid_pdf,
         })
 
-    OUTPUT_PATH.write_text(json.dumps(products, ensure_ascii=False, indent=2), encoding="utf-8")
+    OUTPUT_PATH.write_text(json.dumps(
+        products, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"✅ data.json actualizado: {OUTPUT_PATH}")
     print(f"📦 Productos cargados: {len(products)}")
 
