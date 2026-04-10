@@ -6,6 +6,28 @@ Plataforma moderna y profesional para buscar y descargar fichas técnicas de pro
 
 ---
 
+## 🔐 Acceso Rápido
+
+### URL de desarrollo local
+
+- Principal: `http://localhost:8000/`
+- Si el puerto 8000 está ocupado: `http://localhost:8001/`
+
+### Usuarios de la plataforma
+
+- **Ventas (viewer)**
+        - Usuario: `ventas`
+        - Contraseña: `ventas2026`
+- **Developer (admin)**
+        - Usuario: `developer`
+        - Contraseña: `dev2026`
+
+### URL del Web App (Apps Script)
+
+`https://script.google.com/macros/s/AKfycbxjV0m08h5VgSMsnFOfqeFpekBTRL3VdRwH1dj-skRfX7Lo3EiWozeMBZlPsXVgD2N62Q/exec`
+
+---
+
 ## 🚀 Características
 
 ✅ **Interfaz moderna SaaS** - Diseño profesional tipo Linear/Stripe/Vercel  
@@ -73,6 +95,15 @@ python3 -m http.server 8000
 ```
 
 Abre: `http://localhost:8000`
+
+Si el puerto 8000 ya está en uso:
+
+```bash
+cd SRC
+python3 -m http.server 8001
+```
+
+Abre: `http://localhost:8001`
 
 ---
 
