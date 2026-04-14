@@ -1075,15 +1075,16 @@
     <script>
         const SESSION_KEY = 'docs_auth_session_v1';
         const API_URL_KEY = 'docs_apps_script_url';
-        const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwP2Wa-uoRf5H4dKd-WqbsoyOmKk7Eb3bRffweTbbuWNx4c-2oXqX-9-t7sWWvVYyxZvg/exec';
+        const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxyhRUwgRgmW1L9ktHBzGQB7oU5LAvykTPNKpdHHkfj4le6ttDg8uhLQsv_myeILgaYw/exec';
         const DEPRECATED_APPS_SCRIPT_URLS = [
+            'https://script.google.com/macros/s/AKfycbwP2Wa-uoRf5H4dKd-WqbsoyOmKk7Eb3bRffweTbbuWNx4c-2oXqX-9-t7sWWvVYyxZvg/exec',
             'https://script.google.com/macros/s/AKfycbwz6f3AszJVEBp17AzM_3dnbyOV3kBOipGA_Fi_xYRrnMOAcYAmfwNEue2Z8f88JM4Kkg/exec',
             'https://script.google.com/macros/s/AKfycbxjV0m08h5VgSMsnFOfqeFpekBTRL3VdRwH1dj-skRfX7Lo3EiWozeMBZlPsXVgD2N62Q/exec',
             'https://script.google.com/macros/s/AKfycbyKsh0zq7uwwuZl02UU63c823LkLAWO6nowpzVn0CJvdYQnf2HjtKi5ednLVdI_9pxudw/exec',
             'https://script.google.com/macros/s/AKfycbwPB1PvSZpZtTcsvq-qHMFwK6QCgQ6KoGGEDfbuREDP389tJjfmObumutFWEfzP-9Y7lQ/exec',
             'https://script.google.com/macros/s/AKfycbzNn4o04OR9lqtzrkxRFvUBPfCQqLBBUlyTgcJIaAsiUkpoC0vXzKbUrxYzflw3uPyLkQ/exec'
         ];
-        const ENABLE_LOCAL_AUTH_FALLBACK = false;
+        const ENABLE_LOCAL_AUTH_FALLBACK = true;
 
         // Autenticacion local basica para entorno estatico.
         // Para produccion, mover a backend real con hash de contrasena.
@@ -2436,6 +2437,9 @@
             }
 
             if (!response.ok) {
+                if (response.status === 405) {
+                    throw new Error('El deployment actual de Apps Script no acepta POST (HTTP 405). Publica la Web App con acceso Cualquiera y ejecutar como Propietario.');
+                }
                 throw new Error('No fue posible conectar con Apps Script. Estado: ' + response.status);
             }
 
