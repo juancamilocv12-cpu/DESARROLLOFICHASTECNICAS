@@ -1220,21 +1220,50 @@
             });
         }
 
-        function login() {
-            const username = document.getElementById('usernameInput').value.trim();
+        async function login() {
+            const username = document.getElementById('usernameInput').value.trim().toLowerCase();
             const password = document.getElementById('passwordInput').value;
             const authError = document.getElementById('authError');
 
-            const user = LOCAL_USERS[username];
-            if (!user || user.password !== password) {
-                authError.textContent = 'Usuario o contraseña inválidos.';
+            if (!username || !password) {
+                authError.textContent = 'Ingresa usuario y contraseña.';
                 return;
             }
 
-            currentSession = { username: username, role: user.role };
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
             authError.textContent = '';
-            applySessionUI();
+
+            try {
+                const clientInfo = await collectClientInfo();
+                const result = await callAppsScript({
+                    action: 'authenticate',
+                    username: username,
+                    password: password,
+                    clientInfo: clientInfo
+                });
+
+                currentSession = {
+                    username: (result.username || username).toLowerCase(),
+                    role: result.role,
+                    password: password
+                };
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+                applySessionUI();
+            } catch (error) {
+                const localUser = LOCAL_USERS[username];
+                if (localUser && localUser.password === password) {
+                    currentSession = {
+                        username: username,
+                        role: localUser.role,
+                        password: password
+                    };
+                    sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+                    applySessionUI();
+                    setAdminStatus('Inicio local activo (sin log remoto). Verifica la URL de Apps Script para registrar accesos.', true);
+                    return;
+                }
+
+                authError.textContent = error.message || 'Usuario o contraseña inválidos.';
+            }
         }
 
         function logout() {
@@ -2373,10 +2402,13 @@
 
             localStorage.setItem(API_URL_KEY, url);
 
-            const requestPayload = Object.assign({}, payload, {
-                username: currentSession ? currentSession.username : '',
-                password: getCurrentPasswordForApi()
-            });
+            const requestPayload = Object.assign({}, payload);
+            if (!requestPayload.username) {
+                requestPayload.username = currentSession ? currentSession.username : '';
+            }
+            if (!requestPayload.password) {
+                requestPayload.password = getCurrentPasswordForApi();
+            }
 
             let response;
             try {
@@ -2407,8 +2439,44 @@
             if (!currentSession) {
                 return '';
             }
+            if (currentSession.password) {
+                return currentSession.password;
+            }
             const localUser = LOCAL_USERS[currentSession.username];
             return localUser ? localUser.password : '';
+        }
+
+        async function collectClientInfo() {
+            return {
+                ipAddress: await fetchPublicIp(),
+                language: navigator.language || '',
+                platform: navigator.platform || '',
+                userAgent: navigator.userAgent || '',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+            };
+        }
+
+        async function fetchPublicIp() {
+            const timeoutMs = 3500;
+            const timeoutPromise = new Promise(function (resolve) {
+                setTimeout(function () { resolve(''); }, timeoutMs);
+            });
+
+            const ipPromise = fetch('https://api.ipify.org?format=json')
+                .then(function (response) {
+                    if (!response.ok) {
+                        return '';
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    return (data && data.ip) ? String(data.ip).trim() : '';
+                })
+                .catch(function () {
+                    return '';
+                });
+
+            return Promise.race([ipPromise, timeoutPromise]);
         }
 
         function fileToBase64(file) {

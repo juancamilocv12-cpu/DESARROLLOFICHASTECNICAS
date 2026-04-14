@@ -24,13 +24,50 @@ const SHEET_ID = "1TqIvMr7oR3lyNvpS3rx7qf5pRunOvm3ytG8vmN_EC7A";
 const SHEET_NAME = "Hoja 1";
 const OUTPUT_FOLDER_ID = "11NKToJKRaxnui4k09TsTG5tLltk5mqxi";
 const USER_EMAIL = "comertexonline@gmail.com";
+const ACCESS_LOG_SHEET_NAME = "access_logs";
+const DEFAULT_VIEWER_PASSWORD = "ventas2026";
 
 // Usuario -> password y rol.
 // Recomendado: mover a Script Properties para mayor seguridad.
-const APP_USERS = {
-  "ventas": { password: "ventas2026", role: "viewer" },
-  "developer": { password: "dev2026", role: "developer" }
-};
+const APP_USERS = (function() {
+  const users = {
+    "ventas": { password: "ventas2026", role: "viewer" },
+    "developer": { password: "dev2026", role: "developer" }
+  };
+
+  const viewerEmails = [
+    "eeljach@comertex.com.co",
+    "pvargas@comertex.com.co",
+    "jpernia@comertex.com.co",
+    "cperlaza@comertex.com.co",
+    "dpulgarin@comertex.com.co",
+    "mpajon@comertex.com.co",
+    "sgiraldo@comertex.com.co",
+    "jromero@comertex.com.co",
+    "cadiaz@comertex.com.co",
+    "jbarrera@comertex.com.co",
+    "dgomez@comertex.com.co",
+    "cprieto@comertex.com.co",
+    "amartinez@comertex.com.co",
+    "ajimenez@comertex.com.co",
+    "eamado@comertex.com.co",
+    "omejia@comertex.com.co",
+    "ymedellin@comertex.com.co",
+    "mmedina@comertex.com.co",
+    "wortiz@comertex.com.co",
+    "mlopez@comertex.com.co",
+    "kcifuentes@comertex.com.co",
+    "orincon@comertex.com.co",
+    "fgutierrez@comertex.com.co",
+    "esuarez@comertex.com.co"
+  ];
+
+  viewerEmails.forEach(function(email) {
+    users[email.toLowerCase()] = { password: DEFAULT_VIEWER_PASSWORD, role: "viewer" };
+  });
+
+  return users;
+})();
 
 const DOC_TYPES = {
   technical: "technical",
@@ -71,11 +108,29 @@ function doPost(e) {
 
     const auth = authenticate(payload.username, payload.password);
     if (!auth.ok) {
+      if (action === "authenticate") {
+        logAccessEvent({
+          event: "login_failed",
+          success: false,
+          username: payload.username,
+          role: "",
+          action: action,
+          clientInfo: payload.clientInfo || {}
+        });
+      }
       return jsonResponse(auth);
     }
 
     if (action === "authenticate") {
-      return jsonResponse({ ok: true, role: auth.role, username: payload.username });
+      logAccessEvent({
+        event: "login_success",
+        success: true,
+        username: auth.username,
+        role: auth.role,
+        action: action,
+        clientInfo: payload.clientInfo || {}
+      });
+      return jsonResponse({ ok: true, role: auth.role, username: auth.username });
     }
 
     if (action === "listReferences") {
@@ -298,12 +353,123 @@ function parsePayload(e) {
 }
 
 function authenticate(username, password) {
-  const user = APP_USERS[username || ""];
+  const normalizedUsername = sanitizeUsername(username);
+  const user = APP_USERS[normalizedUsername];
   if (!user || user.password !== password) {
     return { ok: false, error: "Credenciales invalidas." };
   }
 
-  return { ok: true, role: user.role };
+  return { ok: true, role: user.role, username: normalizedUsername };
+}
+
+function sanitizeUsername(username) {
+  return (username || "")
+    .toString()
+    .trim()
+    .toLowerCase();
+}
+
+function logAccessEvent(entry) {
+  try {
+    const clientInfo = entry.clientInfo || {};
+    const ip = sanitizeLogValue(clientInfo.ipAddress || clientInfo.ip || "");
+    const geo = resolveGeoByIp(ip);
+    const sheet = getAccessLogSheet();
+
+    sheet.appendRow([
+      new Date(),
+      sanitizeLogValue(entry.event),
+      sanitizeLogValue(entry.action),
+      entry.success ? "true" : "false",
+      sanitizeLogValue(entry.username),
+      sanitizeLogValue(entry.role),
+      ip,
+      sanitizeLogValue(geo.country),
+      sanitizeLogValue(geo.region),
+      sanitizeLogValue(geo.city),
+      sanitizeLogValue(geo.latitude),
+      sanitizeLogValue(geo.longitude),
+      sanitizeLogValue(geo.timezone),
+      sanitizeLogValue(geo.isp),
+      sanitizeLogValue(clientInfo.language),
+      sanitizeLogValue(clientInfo.platform),
+      sanitizeLogValue(clientInfo.userAgent)
+    ]);
+  } catch (error) {
+    console.error("No fue posible registrar acceso: " + error.toString());
+  }
+}
+
+function getAccessLogSheet() {
+  const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = spreadsheet.getSheetByName(ACCESS_LOG_SHEET_NAME);
+
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(ACCESS_LOG_SHEET_NAME);
+  }
+
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      "timestamp",
+      "event",
+      "action",
+      "success",
+      "username",
+      "role",
+      "ip",
+      "country",
+      "region",
+      "city",
+      "latitude",
+      "longitude",
+      "timezone",
+      "isp",
+      "language",
+      "platform",
+      "userAgent"
+    ]);
+  }
+
+  return sheet;
+}
+
+function resolveGeoByIp(ip) {
+  const cleanIp = sanitizeLogValue(ip);
+  if (!cleanIp) {
+    return {};
+  }
+
+  try {
+    const url = "https://ipwho.is/" + encodeURIComponent(cleanIp);
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    if (response.getResponseCode() !== 200) {
+      return {};
+    }
+
+    const data = JSON.parse(response.getContentText() || "{}");
+    if (!data || data.success === false) {
+      return {};
+    }
+
+    return {
+      country: data.country || "",
+      region: data.region || "",
+      city: data.city || "",
+      latitude: data.latitude || "",
+      longitude: data.longitude || "",
+      timezone: (data.timezone && data.timezone.id) || "",
+      isp: data.connection && data.connection.isp ? data.connection.isp : ""
+    };
+  } catch (error) {
+    console.warn("No fue posible resolver geolocalizacion por IP: " + error.toString());
+    return {};
+  }
+}
+
+function sanitizeLogValue(value) {
+  return (value === null || value === undefined)
+    ? ""
+    : value.toString().trim();
 }
 
 function jsonResponse(data) {
