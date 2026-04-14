@@ -2398,9 +2398,18 @@
         }
 
         async function callAppsScript(payload) {
-            const url = (document.getElementById('apiUrlInput').value || '').trim();
+            const input = document.getElementById('apiUrlInput');
+            const configuredUrl = (input.value || '').trim();
+            const storedUrl = (localStorage.getItem(API_URL_KEY) || '').trim();
+            const fallbackUrl = DEFAULT_APPS_SCRIPT_URL;
+            const url = configuredUrl || storedUrl || fallbackUrl;
+
             if (!url) {
-                throw new Error('Configura la URL de la Web App de Apps Script en el panel de desarrollador.');
+                throw new Error('No se pudo resolver la URL de Apps Script.');
+            }
+
+            if (!configuredUrl) {
+                input.value = url;
             }
 
             localStorage.setItem(API_URL_KEY, url);
