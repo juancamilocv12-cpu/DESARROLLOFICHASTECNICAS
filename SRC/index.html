@@ -1082,6 +1082,7 @@
             'https://script.google.com/macros/s/AKfycbwPB1PvSZpZtTcsvq-qHMFwK6QCgQ6KoGGEDfbuREDP389tJjfmObumutFWEfzP-9Y7lQ/exec',
             'https://script.google.com/macros/s/AKfycbzNn4o04OR9lqtzrkxRFvUBPfCQqLBBUlyTgcJIaAsiUkpoC0vXzKbUrxYzflw3uPyLkQ/exec'
         ];
+        const ENABLE_LOCAL_AUTH_FALLBACK = false;
 
         // Autenticacion local basica para entorno estatico.
         // Para produccion, mover a backend real con hash de contrasena.
@@ -1251,7 +1252,7 @@
                 applySessionUI();
             } catch (error) {
                 const localUser = LOCAL_USERS[username];
-                if (localUser && localUser.password === password) {
+                if (ENABLE_LOCAL_AUTH_FALLBACK && localUser && localUser.password === password) {
                     currentSession = {
                         username: username,
                         role: localUser.role,
@@ -1263,7 +1264,7 @@
                     return;
                 }
 
-                authError.textContent = error.message || 'Usuario o contraseña inválidos.';
+                authError.textContent = error.message || 'No se pudo iniciar sesión. Verifica la conexión con Apps Script.';
             }
         }
 
@@ -2448,8 +2449,12 @@
         }
 
         async function collectClientInfo() {
+            const geo = await fetchBrowserLocation();
             return {
                 ipAddress: await fetchPublicIp(),
+                latitude: geo.latitude || '',
+                longitude: geo.longitude || '',
+                accuracy: geo.accuracy || '',
                 language: navigator.language || '',
                 platform: navigator.platform || '',
                 userAgent: navigator.userAgent || '',
@@ -2463,21 +2468,54 @@
                 setTimeout(function () { resolve(''); }, timeoutMs);
             });
 
-            const ipPromise = fetch('https://api.ipify.org?format=json')
-                .then(function (response) {
-                    if (!response.ok) {
-                        return '';
+            const providers = [
+                'https://api.ipify.org?format=json',
+                'https://api64.ipify.org?format=json',
+                'https://ipapi.co/json/'
+            ];
+
+            const ipPromise = (async function () {
+                for (let i = 0; i < providers.length; i++) {
+                    try {
+                        const response = await fetch(providers[i]);
+                        if (!response.ok) {
+                            continue;
+                        }
+                        const data = await response.json();
+                        const ip = (data && (data.ip || data.ip_address)) ? String(data.ip || data.ip_address).trim() : '';
+                        if (ip) {
+                            return ip;
+                        }
+                    } catch (error) {
+                        // Continua con el siguiente proveedor.
                     }
-                    return response.json();
-                })
-                .then(function (data) {
-                    return (data && data.ip) ? String(data.ip).trim() : '';
-                })
-                .catch(function () {
-                    return '';
-                });
+                }
+                return '';
+            })();
 
             return Promise.race([ipPromise, timeoutPromise]);
+        }
+
+        async function fetchBrowserLocation() {
+            if (!navigator.geolocation) {
+                return {};
+            }
+
+            return new Promise(function (resolve) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    resolve({
+                        latitude: position.coords && position.coords.latitude ? String(position.coords.latitude) : '',
+                        longitude: position.coords && position.coords.longitude ? String(position.coords.longitude) : '',
+                        accuracy: position.coords && position.coords.accuracy ? String(position.coords.accuracy) : ''
+                    });
+                }, function () {
+                    resolve({});
+                }, {
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumAge: 300000
+                });
+            });
         }
 
         function fileToBase64(file) {

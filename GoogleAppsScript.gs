@@ -374,6 +374,9 @@ function logAccessEvent(entry) {
     const clientInfo = entry.clientInfo || {};
     const ip = sanitizeLogValue(clientInfo.ipAddress || clientInfo.ip || "");
     const geo = resolveGeoByIp(ip);
+    const latitude = sanitizeLogValue(clientInfo.latitude || "") || sanitizeLogValue(geo.latitude);
+    const longitude = sanitizeLogValue(clientInfo.longitude || "") || sanitizeLogValue(geo.longitude);
+    const timezone = sanitizeLogValue(clientInfo.timezone || "") || sanitizeLogValue(geo.timezone);
     const sheet = getAccessLogSheet();
 
     sheet.appendRow([
@@ -387,9 +390,9 @@ function logAccessEvent(entry) {
       sanitizeLogValue(geo.country),
       sanitizeLogValue(geo.region),
       sanitizeLogValue(geo.city),
-      sanitizeLogValue(geo.latitude),
-      sanitizeLogValue(geo.longitude),
-      sanitizeLogValue(geo.timezone),
+      latitude,
+      longitude,
+      timezone,
       sanitizeLogValue(geo.isp),
       sanitizeLogValue(clientInfo.language),
       sanitizeLogValue(clientInfo.platform),
