@@ -24,7 +24,7 @@ Plataforma moderna y profesional para buscar y descargar fichas técnicas de pro
 
 ### URL del Web App (Apps Script)
 
-`https://script.google.com/macros/s/AKfycbwz6f3AszJVEBp17AzM_3dnbyOV3kBOipGA_Fi_xYRrnMOAcYAmfwNEue2Z8f88JM4Kkg/exec`
+`https://script.google.com/macros/s/AKfycbwP2Wa-uoRf5H4dKd-WqbsoyOmKk7Eb3bRffweTbbuWNx4c-2oXqX-9-t7sWWvVYyxZvg/exec`
 
 ---
 
