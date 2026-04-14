@@ -1093,6 +1093,37 @@
             developer: { password: 'dev2026', role: 'developer' }
         };
 
+        const VIEWER_EMAIL_USERS = [
+            'eeljach@comertex.com.co',
+            'pvargas@comertex.com.co',
+            'jpernia@comertex.com.co',
+            'cperlaza@comertex.com.co',
+            'dpulgarin@comertex.com.co',
+            'mpajon@comertex.com.co',
+            'sgiraldo@comertex.com.co',
+            'jromero@comertex.com.co',
+            'cadiaz@comertex.com.co',
+            'jbarrera@comertex.com.co',
+            'dgomez@comertex.com.co',
+            'cprieto@comertex.com.co',
+            'amartinez@comertex.com.co',
+            'ajimenez@comertex.com.co',
+            'eamado@comertex.com.co',
+            'omejia@comertex.com.co',
+            'ymedellin@comertex.com.co',
+            'mmedina@comertex.com.co',
+            'wortiz@comertex.com.co',
+            'mlopez@comertex.com.co',
+            'kcifuentes@comertex.com.co',
+            'orincon@comertex.com.co',
+            'fgutierrez@comertex.com.co',
+            'esuarez@comertex.com.co'
+        ];
+
+        VIEWER_EMAIL_USERS.forEach(function (email) {
+            LOCAL_USERS[email] = { password: 'ventas2026', role: 'viewer' };
+        });
+
         let allProducts = [];
         let allReferences = [];
         let filteredReferences = [];
